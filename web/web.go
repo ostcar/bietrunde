@@ -5,15 +5,20 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
+	"log"
 	"net"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/ostcar/bietrunde/config"
 	"github.com/ostcar/bietrunde/model"
-	"github.com/ostcar/timer/sticky"
+	"github.com/ostcar/bietrunde/web/template"
+	"github.com/ostcar/sticky"
 	"golang.org/x/exp/slog"
 )
+
+const cookieName = "bietrunde"
 
 //go:embed files
 var publicFiles embed.FS
@@ -71,12 +76,95 @@ func (s *server) registerHandlers() {
 	router := mux.NewRouter()
 
 	router.PathPrefix("/assets").Handler(handleStatic())
-	// router.Handle("/", handleError(s.campainList))
-	// router.Handle("/create_campain", handleError(s.campainCreate))
-	// router.Handle("/campain/{campain_id:[0-9]+}", handleError(s.campainDetail))
-	// router.Handle("/campain/{campain_id:[0-9]+}/create_day", handleError(s.dayCreate))
+	router.Handle("/", handleError(s.handleHome))
+	router.Handle("/register", handleError(s.handleRegister))
+	router.Handle("/edit", handleError(s.handleEdit))
 
 	s.Handler = loggingMiddleware(router)
+}
+
+func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
+	m, done := s.model.ForReading()
+	defer done()
+
+	bieterID := readAuthCookie(r)
+	bieter, ok := m.Bieter[bieterID]
+
+	if bieterID == 0 || !ok {
+		return template.LoginPage(m.State).Render(r.Context(), w)
+	}
+
+	return template.Bieter(bieter).Render(r.Context(), w)
+}
+
+func (s server) handleRegister(w http.ResponseWriter, r *http.Request) error {
+	m, write := s.model.ForWriting()
+
+	id, event := m.BieterCreate()
+	write(event)
+
+	log.Printf("set id %d", id)
+	setAuthCookie(w, id)
+
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	return nil
+}
+
+func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
+	if r.Method == http.MethodPost {
+		if err := r.ParseForm(); err != nil {
+			return err
+		}
+
+		m, write := s.model.ForWriting()
+		bieterID := readAuthCookie(r)
+		bieter, ok := m.Bieter[bieterID]
+
+		if bieterID == 0 || !ok {
+			return template.LoginPage(m.State).Render(r.Context(), w)
+		}
+
+		r.ParseForm()
+		bieter.Name = r.FormValue("name")
+		if err := write(m.BieterUpdate(bieter)); err != nil {
+			return err
+		}
+
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return nil
+	}
+
+	m, done := s.model.ForReading()
+	defer done()
+
+	bieterID := readAuthCookie(r)
+	bieter, ok := m.Bieter[bieterID]
+
+	if bieterID == 0 || !ok {
+		return template.LoginPage(m.State).Render(r.Context(), w)
+	}
+
+	return template.BieterEdit(bieter).Render(r.Context(), w)
+}
+
+func setAuthCookie(w http.ResponseWriter, id int) {
+	cookie := &http.Cookie{
+		Name:     cookieName,
+		Value:    strconv.Itoa(id),
+		HttpOnly: true,
+	}
+	http.SetCookie(w, cookie)
+}
+
+func readAuthCookie(r *http.Request) int {
+	cookie, err := r.Cookie(cookieName)
+	if err != nil {
+		return 0
+	}
+
+	// Ignore the error, since we want to return 0 on error anyway.
+	id, _ := strconv.Atoi(cookie.Value)
+	return id
 }
 
 func handleStatic() http.Handler {

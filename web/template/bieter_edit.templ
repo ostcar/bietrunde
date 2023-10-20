@@ -1,0 +1,85 @@
+package template
+
+import (
+	"github.com/ostcar/bietrunde/model"
+)
+
+templ BieterEdit(bieter model.Bieter) {
+	@layout("Bietrunde - " + bieter.Name) {
+		<div class="columns">
+			<form class="column is-half-desktop" action="/edit" method="post">
+				@formField("Name", "name")
+				@formFieldMail("E-Mail", "mail")
+				@formFieldMail("Adresse", "adresse")
+				@formFieldCheckbox("Mitglied", "mitglied")
+				@formVerteilstelle()
+				@formField("Teilpartner", "teilpartner")
+				@formField("IBAN", "iban")
+				@formField("Kontoinhaber", "kontoinhaber")
+				@formAbbuchung()
+				<div class="control">
+					<button class="button is-primary" type="submit">Speichern</button>
+					<a href="/" class="button is-danger">Abbrechen</a>
+				</div>
+			</form>
+		</div>
+	}
+}
+
+templ formField(name string, attr string) {
+	@formFieldHelper(name, attr, "text")
+}
+
+templ formFieldMail(name string, attr string) {
+	@formFieldHelper(name, attr, "email")
+}
+
+templ formFieldCheckbox(name string, attr string) {
+	<div class="field">
+		<div class="control">
+			<label class="checkbox">
+				<input name={ attr } type="checkbox"/>
+				{ name }
+			</label>
+		</div>
+	</div>
+}
+
+templ formVerteilstelle() {
+	<div class="field">
+		<label class="label">Verteilstelle</label>
+		<div class="control">
+			<div class="select">
+				<select>
+					<option>-</option>
+					<option>Villingen</option>
+					<option>Schwenningen</option>
+					<option>Überauchen</option>
+				</select>
+			</div>
+		</div>
+	</div>
+}
+
+templ formAbbuchung() {
+	<div class="field">
+		<label class="label">Abbuchung</label>
+		<div class="control">
+			<div class="select">
+				<select>
+					<option>Monatlich</option>
+					<option>Jährlich</option>
+				</select>
+			</div>
+		</div>
+	</div>
+}
+
+templ formFieldHelper(name string, attr string, type_ string) {
+	<div class="field">
+		<label class="label">{ name }</label>
+		<div class="control">
+			<input name={ attr } class="input" type={ type_ } placeholder={ name }/>
+		</div>
+	</div>
+}

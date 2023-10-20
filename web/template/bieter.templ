@@ -1,0 +1,85 @@
+package template
+
+import (
+	"strconv"
+	"github.com/ostcar/bietrunde/model"
+)
+
+templ Bieter(bieter model.Bieter) {
+	@layout("Bietrunde - " + bieter.Name) {
+		<h1 class="title is-4">Hallo { bieter.Name }</h1>
+		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
+		<dl class="block">
+			<dt class="has-text-weight-bold">E-Mail:</dt>
+			<dd class="ml-5">
+				@ddString( bieter.Mail)
+			</dd>
+			<dt class="has-text-weight-bold">Adresse:</dt>
+			<dd class="ml-5">
+				@ddString( bieter.Adresse)
+			</dd>
+			<dt class="has-text-weight-bold">Mitglied:</dt>
+			<dd class="ml-5">
+				@jaNein(bieter.Mitglied)
+			</dd>
+			<dt class="has-text-weight-bold">Verteilstelle:</dt>
+			<dd class="ml-5">
+				@verteilstelle(bieter.Verteilstelle)
+			</dd>
+			<dt class="has-text-weight-bold">Teilpartner:</dt>
+			<dd class="ml-5">
+				@ddString( bieter.Teilpartner)
+			</dd>
+			<dt class="has-text-weight-bold">IBAN:</dt>
+			<dd class="ml-5">
+				@ddString( bieter.IBAN)
+			</dd>
+			<dt class="has-text-weight-bold">Kontoinhaber:</dt>
+			<dd class="ml-5">
+				@ddString( bieter.Kontoinhaber)
+			</dd>
+			<dt class="has-text-weight-bold">Abbuchung:</dt>
+			<dd class="ml-5">
+				@abbuchung(bieter.Jaehrlich)
+			</dd>
+		</dl>
+		<a href="/edit" class="block button is-primary">Bearbeiten</a>
+	}
+}
+
+templ ddString(s string) {
+	if s == "" {
+		-
+	} else {
+		{ s }
+	}
+}
+
+templ jaNein(m bool) {
+	if m {
+		Ja
+	} else {
+		Nein
+	}
+}
+
+templ verteilstelle(v int) {
+	switch v {
+		case 0:
+			-
+		case 1:
+			Villingen
+		case 2:
+			Schwenningen
+		case 3:
+			Überauchen
+	}
+}
+
+templ abbuchung(a bool) {
+	if a {
+		Jährlich
+	} else {
+		Monatlich
+	}
+}

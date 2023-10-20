@@ -1,0 +1,42 @@
+package template
+
+import "github.com/ostcar/bietrunde/model"
+
+templ LoginPage(state model.ServiceState) {
+	@layout("login") {
+		<section class="box">
+			@login()
+		</section>
+		if state == model.StateRegistration {
+			<section class="box">
+				@register()
+			</section>
+		}
+	}
+}
+
+templ login() {
+	<h1 class="title is-3">Mit Bietnummer anmelden</h1>
+	<form action="/login" method="post">
+		<div class="field">
+			<label class="label">Bietnummer:</label>
+			<div class="control">
+				<input name="bietnumber" class="input" type="text" placeholder="12345..."/>
+			</div>
+			<p class="help">Gebe die Bietnummer an, mit der du dich registriert hast.</p>
+		</div>
+		<div class="control">
+			<button class="button is-primary" type="submit">Anmelden</button>
+		</div>
+	</form>
+}
+
+templ register() {
+	<h1 class="title is-3">Neue Bietnummer anlegen</h1>
+	<form action="/register" method="post">
+		<div class="control">
+			<p>Bitte lege nur dann eine neue Bietnummer an, wenn du noch keine hast. Falls du deine Bietnummer vergessen hast, dann setze dich bitte mit dem Vorstand in Verbindung.</p>
+			<button class="button is-primary" type="submit">Neu Registrieren</button>
+		</div>
+	</form>
+}

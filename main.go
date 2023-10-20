@@ -9,7 +9,7 @@ import (
 	"github.com/ostcar/bietrunde/config"
 	"github.com/ostcar/bietrunde/model"
 	"github.com/ostcar/bietrunde/web"
-	"github.com/ostcar/timer/sticky"
+	"github.com/ostcar/sticky"
 )
 
 func main() {

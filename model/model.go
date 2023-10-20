@@ -1,41 +1,56 @@
 package model
 
+import "math/rand"
+
 // Bieter is a person that makes an offer.
 type Bieter struct {
-	ID            int
-	Name          string
-	Teilpartner   string
-	Mail          string
-	Verteilstelle int
-	Kontoinhaber  string
-	Mitglied      bool
-	Adresse       string
-	IBAN          string
-	Jaehrlich     bool
-	Gebot         int
+	ID            int    `json:"id"`
+	Name          string `json:"name"`
+	Mail          string `json:"mail"`
+	Adresse       string `json:"adresse"`
+	Mitglied      bool   `json:"mitglied"`
+	Verteilstelle int    `json:"verteilstelle"`
+	Teilpartner   string `json:"teilpartner"`
+	IBAN          string `json:"iban"`
+	Kontoinhaber  string `json:"kontoinhaber"`
+	Jaehrlich     bool   `json:"jaehrlich"`
+	Gebot         int    `json:"gebot"`
 }
 
 // Model of the service.
 type Model struct {
-	bieter map[int]Bieter
-	state  ServiceState
+	Bieter map[int]Bieter
+	State  ServiceState
 }
 
 // New returns an initialized model.
 func New() Model {
 	return Model{
-		bieter: make(map[int]Bieter),
+		Bieter: make(map[int]Bieter),
+		State:  StateRegistration,
 	}
+}
+
+// BieterCreate creates a new bieter with empty data.
+func (m Model) BieterCreate() (int, Event) {
+	id := rand.Intn(100_000_000)
+	return id, eventBieterCreate{ID: id}
+}
+
+// BieterUpdate updates all fields of a bieter.
+func (m Model) BieterUpdate(bieter Bieter) Event {
+	return eventBieterUpdate{bieter}
 }
 
 // ServiceState is the state of the service.
 type ServiceState int
 
+// States of the service.
 const (
-	stateInvalid ServiceState = iota
-	stateRegistration
-	stateValidation
-	stateOffer
+	StateInvalid ServiceState = iota
+	StateRegistration
+	StateValidation
+	StateOffer
 )
 
 func (s ServiceState) String() string {
