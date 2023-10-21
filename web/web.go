@@ -1,6 +1,7 @@
 package web
 
 import (
+	"cmp"
 	"context"
 	"embed"
 	"errors"
@@ -8,6 +9,7 @@ import (
 	"io/fs"
 	"net"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -84,9 +86,10 @@ func (s *server) registerHandlers() {
 	router.Handle("/edit", handleError(s.handleEdit))
 	// TODO: PDF, Gebot
 
-	// router.Handle("/admin", handleError(s.handleAdmin))
-	// router.Handle("/admin/login", handleError(s.handleAdminLogin))
-	// router.Handle("/admin/delete/{id:[0-9]+}", handleError(s.handleAdminDelete))
+	router.Handle("/admin", handleError(s.adminPage(s.handleAdmin)))
+	router.Handle("/admin/new", handleError(s.adminPage(s.handleAdminNew)))
+	router.Handle("/admin/delete/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminDelete)))
+	router.Handle("/admin/edit/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminEdit)))
 
 	s.Handler = loggingMiddleware(router)
 }
@@ -209,20 +212,11 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 			return nil
 		}
 
-		if err := r.ParseForm(); err != nil {
-			return template.BieterEdit(bieter, "").Render(r.Context(), w)
+		bieter, errMsg := parseBieterEdit(r, bieter)
+		if errMsg != "" {
+			return template.BieterEdit(bieter, "Formular kann nicht gelesen werden. Versuche es erneut").Render(r.Context(), w)
 		}
 
-		bieter.Vorname = strings.TrimSpace(r.Form.Get("vorname"))
-		bieter.Nachname = strings.TrimSpace(r.Form.Get("nachname"))
-		bieter.Mail = strings.TrimSpace(r.Form.Get("mail"))
-		bieter.Adresse = strings.TrimSpace(r.Form.Get("adresse"))
-		bieter.Mitglied = r.Form.Has("mitglied")
-		bieter.Verteilstelle = model.VerteilstelleFromAttr(strings.TrimSpace(r.Form.Get("verteilstelle")))
-		bieter.Teilpartner = strings.TrimSpace(r.Form.Get("teilpartner"))
-		bieter.IBAN = strings.TrimSpace(r.Form.Get("iban"))
-		bieter.Kontoinhaber = strings.TrimSpace(r.Form.Get("kontoinhaber"))
-		bieter.Jaehrlich = strings.TrimSpace(r.Form.Get("abbuchung")) == "jaehrlich"
 		if err := write(m.BieterUpdate(bieter)); err != nil {
 			return template.BieterEdit(bieter, userError(err)).Render(r.Context(), w)
 		}
@@ -236,73 +230,172 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 	}
 }
 
-// func (s server) handleAdmin(w http.ResponseWriter, r *http.Request) error {
-// 	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
-// 	if err != nil {
-// 		return err
-// 	}
+func parseBieterEdit(r *http.Request, bieter model.Bieter) (model.Bieter, string) {
+	if err := r.ParseForm(); err != nil {
+		return bieter, "Formular kann nicht gelesen werden. Versuche es erneut"
+	}
 
-// 	m, done := s.model.ForReading()
-// 	defer done()
+	bieter.Vorname = strings.TrimSpace(r.Form.Get("vorname"))
+	bieter.Nachname = strings.TrimSpace(r.Form.Get("nachname"))
+	bieter.Mail = strings.TrimSpace(r.Form.Get("mail"))
+	bieter.Adresse = strings.TrimSpace(r.Form.Get("adresse"))
+	bieter.Mitglied = r.Form.Has("mitglied")
+	bieter.Verteilstelle = model.VerteilstelleFromAttr(strings.TrimSpace(r.Form.Get("verteilstelle")))
+	bieter.Teilpartner = strings.TrimSpace(r.Form.Get("teilpartner"))
+	bieter.IBAN = strings.TrimSpace(r.Form.Get("iban"))
+	bieter.Kontoinhaber = strings.TrimSpace(r.Form.Get("kontoinhaber"))
+	bieter.Jaehrlich = strings.TrimSpace(r.Form.Get("abbuchung")) == "jaehrlich"
+	return bieter, ""
+}
 
-// 	bieter := make([]model.Bieter, 0, len(m.Bieter))
-// 	for _, v := range m.Bieter {
-// 		bieter = append(bieter, v)
-// 	}
-// 	slices.SortFunc(bieter, func(a, b model.Bieter) int {
-// 		if c := cmp.Compare(a.Nachname, b.Nachname); c != 0 {
-// 			return c
-// 		}
+func (s server) adminPage(next func(w http.ResponseWriter, r *http.Request) error) func(w http.ResponseWriter, r *http.Request) error {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+		if err == nil && user.IsAdmin {
+			return next(w, r)
+		}
 
-// 		if c := cmp.Compare(a.Vorname, b.Vorname); c != 0 {
-// 			return c
-// 		}
+		// TODO: Make a redirect on htmx requests!
 
-// 		return cmp.Compare(a.ID, b.ID)
-// 	})
+		switch r.Method {
+		case http.MethodGet:
+			return template.AdminLogin("").Render(r.Context(), w)
 
-// 	return template.Admin(user, bieter).Render(r.Context(), w)
-// }
+		case http.MethodPost:
+			if err := r.ParseForm(); err != nil {
+				return template.AdminLogin("Formular kann nicht gelesen werden. Bitte versuche es erneut.").Render(r.Context(), w)
+			}
 
-// func (s server) handleAdminLogin(w http.ResponseWriter, r *http.Request) error {
-// 	r.ParseForm()
+			pw := r.Form.Get("password")
+			if pw != s.cfg.AdminToken {
+				return template.AdminLogin("Password ist falsch.").Render(r.Context(), w)
+			}
 
-// 	pw := r.Form.Get("password")
-// 	if pw == s.cfg.AdminToken {
-// 		user, err := user.FromRequest(r, []byte(s.cfg.Secred))
-// 		if err != nil {
-// 			return err
-// 		}
-// 		user.IsAdmin = true
-// 		user.SetCookie(w, []byte(s.cfg.Secred))
-// 	}
+			user.IsAdmin = true
+			user.SetCookie(w, []byte(s.cfg.Secred))
 
-// 	http.Redirect(w, r, "/admin", http.StatusTemporaryRedirect)
-// 	return nil
-// }
+			return next(w, r)
 
-// func (s server) handleAdminDelete(w http.ResponseWriter, r *http.Request) error {
-// 	// TODO: Make me a post
-// 	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if !user.IsAdmin {
-// 		http.Redirect(w, r, "/admin", http.StatusTemporaryRedirect)
-// 		return nil
-// 	}
+		default:
+			http.Error(w, "Fehler", http.StatusMethodNotAllowed)
+			return nil
+		}
+	}
+}
 
-// 	m, write := s.model.ForWriting()
-// 	defer write()
+func (s server) handleAdmin(w http.ResponseWriter, r *http.Request) error {
+	m, done := s.model.ForReading()
+	defer done()
 
-// 	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
-// 	if err := write(m.BieterDelete(bietID)); err != nil {
-// 		return err
-// 	}
+	bieter := adminBieterList(m)
+	return template.Admin(bieter).Render(r.Context(), w)
+}
 
-// 	http.Redirect(w, r, "/admin", http.StatusTemporaryRedirect)
-// 	return nil
-// }
+func adminBieterList(m model.Model) []model.Bieter {
+	bieter := make([]model.Bieter, 0, len(m.Bieter))
+	for _, v := range m.Bieter {
+		bieter = append(bieter, v)
+	}
+	slices.SortFunc(bieter, func(a, b model.Bieter) int {
+		if c := cmp.Compare(a.Nachname, b.Nachname); c != 0 {
+			return c
+		}
+
+		if c := cmp.Compare(a.Vorname, b.Vorname); c != 0 {
+			return c
+		}
+
+		return cmp.Compare(a.ID, b.ID)
+	})
+	return bieter
+}
+
+func (s server) handleAdminNew(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Hier wird nur geupdated", http.StatusMethodNotAllowed)
+		return nil
+	}
+
+	m, write, done := s.model.ForWriting()
+	defer done()
+
+	bieterID, event := m.BieterCreate()
+	if err := write(event); err != nil {
+		// TODO
+		return nil
+	}
+
+	bieter := m.Bieter[bieterID]
+	_ = bieter
+
+	template.AdminUserTableBody(adminBieterList(m)).Render(r.Context(), w)
+	template.AdminBieterEdit(bieter, "").Render(r.Context(), w)
+
+	return nil
+}
+
+func (s server) handleAdminEdit(w http.ResponseWriter, r *http.Request) error {
+	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	switch r.Method {
+	case http.MethodGet:
+		m, done := s.model.ForReading()
+		defer done()
+
+		bieter, ok := m.Bieter[bietID]
+		if !ok {
+			// TODO: fehlermeldung senden
+			return nil
+		}
+
+		return template.AdminBieterEdit(bieter, "").Render(r.Context(), w)
+	case http.MethodPost:
+		m, write, done := s.model.ForWriting()
+		defer done()
+		bieter, ok := m.Bieter[bietID]
+		if !ok {
+			// TODO: fehlermeldung senden
+			return nil
+		}
+
+		bieter, errMsg := parseBieterEdit(r, bieter)
+		if errMsg != "" {
+			// TODO: fehlermeldung senden
+			return nil
+			return template.BieterEdit(bieter, "Formular kann nicht gelesen werden. Versuche es erneut").Render(r.Context(), w)
+		}
+
+		if err := write(m.BieterUpdate(bieter)); err != nil {
+			// TODO: fehlermeldung senden
+			return nil
+		}
+
+		template.AdminModalEmpty().Render(r.Context(), w)
+		return template.AdminUserTableBody(adminBieterList(m)).Render(r.Context(), w)
+
+	default:
+		http.Error(w, "Fehler", http.StatusMethodNotAllowed)
+		return nil
+	}
+}
+
+func (s server) handleAdminDelete(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodDelete {
+		http.Error(w, "Hier wird nur gelöscht", http.StatusMethodNotAllowed)
+		return nil
+	}
+
+	m, write, done := s.model.ForWriting()
+	defer done()
+
+	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
+	if err := write(m.BieterDelete(bietID)); err != nil {
+		return err
+	}
+
+	bieter := adminBieterList(m)
+	return template.AdminUserTableBody(bieter).Render(r.Context(), w)
+}
 
 func handleStatic() http.Handler {
 	files, err := fs.Sub(publicFiles, "files")

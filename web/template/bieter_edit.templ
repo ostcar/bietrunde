@@ -8,18 +8,7 @@ templ BieterEdit(bieter model.Bieter, err string) {
 	@layout("Bietrunde - " + bieter.Name(), true) {
 		<div class="columns">
 			<form action="/edit" method="post">
-				if err != "" {
-					<p class="help is-danger">{ err }</p>
-				}
-				@formFieldName(bieter.Vorname, bieter.Nachname)
-				@formFieldMail(bieter.Mail)
-				@formFieldAdresse(bieter.Adresse)
-				@formFieldVerteilstelle(bieter.Verteilstelle)
-				@formFieldTeilpartner(bieter.Teilpartner)
-				@formFieldMitglied(bieter.Mitglied)
-				@formFieldIBAN(bieter.IBAN)
-				@formFieldKontoinhaber(bieter.Kontoinhaber)
-				@formAbbuchung(bieter.Jaehrlich)
+				@bieterEditFormFields(bieter, err)
 				<div class="field is-grouped">
 					<div class="control">
 						<button class="button is-primary" type="submit">Speichern</button>
@@ -31,6 +20,21 @@ templ BieterEdit(bieter model.Bieter, err string) {
 			</form>
 		</div>
 	}
+}
+
+templ bieterEditFormFields(bieter model.Bieter, err string) {
+	if err != "" {
+		<p class="help is-danger">{ err }</p>
+	}
+	@formFieldName(bieter.Vorname, bieter.Nachname)
+	@formFieldMail(bieter.Mail)
+	@formFieldAdresse(bieter.Adresse)
+	@formFieldVerteilstelle(bieter.Verteilstelle)
+	@formFieldTeilpartner(bieter.Teilpartner)
+	@formFieldMitglied(bieter.Mitglied)
+	@formFieldIBAN(bieter.IBAN)
+	@formFieldKontoinhaber(bieter.Kontoinhaber)
+	@formAbbuchung(bieter.Jaehrlich)
 }
 
 templ formFieldName(vorname, nachname string) {

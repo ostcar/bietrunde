@@ -5,52 +5,118 @@ import (
 	"github.com/ostcar/bietrunde/model"
 )
 
-templ Admin(bieter []model.Bieter, isAdmin bool) {
+templ Admin(bieter []model.Bieter) {
 	@layout("Admin", true) {
-		if isAdmin {
-			@adminPage(bieter)
-		} else {
-			@adminLogin()
-		}
+		<h1 class="title is-3">Admin</h1>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Bietnummer</th>
+					<th>Name</th>
+					<th></th>
+				</tr>
+			</thead>
+			@AdminUserTableBody(bieter)
+		</table>
+		<div class="buttons">
+			<div
+ 				class="button"
+ 				hx-post="/admin/new"
+ 				hx-target="#admin-user-table-body"
+ 				hx-swap="outerHTML"
+			>
+				Weiteren Bieter
+			</div>
+		</div>
+		@AdminModalEmpty()
 	}
 }
 
-templ adminPage(bieter []model.Bieter) {
-	<h1 class="title is-3">Admin</h1>
-	<table class="table">
-		<thead>
+templ AdminUserTableBody(bieter []model.Bieter) {
+	<tbody id="admin-user-table-body">
+		for _, bieter := range bieter {
 			<tr>
-				<th>Bietnummer</th>
-				<th>Name</th>
-				<th></th>
+				<th>{ strconv.Itoa(bieter.ID) }</th>
+				<th>{ bieter.Name() }</th>
+				<th>
+					<button
+ 						class="button is-warning is-small"
+ 						hx-get={ "/admin/edit/"+ strconv.Itoa(bieter.ID) }
+ 						hx-swap="none"
+					>✎</button>
+					<button
+ 						class="button is-danger is-small"
+ 						hx-delete={ "/admin/delete/"+ strconv.Itoa(bieter.ID) }
+ 						hx-confirm={ bieter.Name() + " wirklich löschen?" }
+ 						hx-target="#admin-user-table-body"
+ 						hx-swap="outerHTML"
+					>🗑</button>
+				</th>
 			</tr>
-		</thead>
-		<tbody>
-			for _, bieter := range bieter {
-				<tr>
-					<th>{ strconv.Itoa(bieter.ID) }</th>
-					<th>{ bieter.Name() }</th>
-					<th>
-						<button class="button is-warning">✎</button>
-						<a href={ templ.URL("/admin/delete/"+ strconv.Itoa(bieter.ID)) } class="button is-danger">⌫</a>
-					</th>
-				</tr>
-			}
-		</tbody>
-	</table>
+		}
+	</tbody>
 }
 
-templ adminLogin() {
-	<h1 class="title is-3">Admin Login</h1>
-	<form action="/admin/login" method="post">
-		<div class="field">
-			<label class="label">Passwort:</label>
-			<div class="control">
-				<input name="password" class="input" type="password"/>
+templ AdminBieterEdit(bieter model.Bieter, err string) {
+	@adminModal(bieter.Name(), "/admin/edit/"+ strconv.Itoa(bieter.ID)) {
+		@bieterEditFormFields(bieter, err)
+	}
+}
+
+script closeAdminModal() {
+    var element = document.getElementById("admin-modal");
+	element.classList.remove("is-active");
+}
+
+templ AdminModalEmpty() {
+	<div id="admin-modal" hx-swap-oob="true"></div>
+}
+
+templ adminModal(title string, postURL string) {
+	<div id="admin-modal" hx-swap-oob="true" class="modal is-active">
+		<div class="modal-background"></div>
+		<form
+ 			hx-post={ postURL }
+ 			hx-target="#admin-user-table-body"
+ 			hx-swap="outerHTML"
+		>
+			<div class="modal-card">
+				<header class="modal-card-head">
+					<p class="modal-card-title">{ title }</p>
+					<button class="delete" aria-label="close" onClick={ closeAdminModal() }></button>
+				</header>
+				<section class="modal-card-body">
+					{ children... }
+				</section>
+				<footer class="modal-card-foot">
+					<button class="button is-success" type="submit">Speichern</button>
+					<button
+ 						class="button"
+ 						type="button"
+ 						onClick={ closeAdminModal() }
+					>Abbrechen</button>
+				</footer>
 			</div>
-		</div>
-		<div class="control">
-			<button class="button is-primary" type="submit">Anmelden</button>
-		</div>
-	</form>
+		</form>
+	</div>
+}
+
+templ AdminLogin(err string) {
+	@layout("Admin", false) {
+		<h1 class="title is-3">Admin Login</h1>
+		<form action="/admin" method="post">
+			<div class="field">
+				<label class="label">Passwort:</label>
+				<div class="control">
+					<input name="password" class="input" type="password"/>
+				</div>
+			</div>
+			if err != "" {
+				<p class="help is-danger">{ err }</p>
+			}
+			<div class="control">
+				<button class="button is-primary" type="submit">Anmelden</button>
+			</div>
+		</form>
+	}
 }
