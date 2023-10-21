@@ -3,11 +3,10 @@ package template
 import (
 	"strconv"
 	"github.com/ostcar/bietrunde/model"
-	"github.com/ostcar/bietrunde/user"
 )
 
-templ Bieter(user user.User, bieter model.Bieter) {
-	@layout(user, "Bietrunde - " + bieter.Name()) {
+templ Bieter( bieter model.Bieter) {
+	@layout("Bietrunde - " + bieter.Name(), true) {
 		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
 		<dl class="block">

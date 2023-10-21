@@ -2,13 +2,12 @@ package template
 
 import (
 	"strconv"
-	"github.com/ostcar/bietrunde/user"
 	"github.com/ostcar/bietrunde/model"
 )
 
-templ Admin(user user.User, bieter []model.Bieter) {
-	@layout(user, "Admin") {
-		if user.IsAdmin {
+templ Admin(bieter []model.Bieter, isAdmin bool) {
+	@layout("Admin", true) {
+		if isAdmin {
 			@adminPage(bieter)
 		} else {
 			@adminLogin()

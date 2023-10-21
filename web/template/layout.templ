@@ -1,10 +1,6 @@
 package template
 
-import (
-	"github.com/ostcar/bietrunde/user"
-)
-
-templ layout(user user.User, name string) {
+templ layout(name string, showLogout bool) {
 	<!DOCTYPE html>
 	<html lang="de">
 		<head>
@@ -24,7 +20,7 @@ templ layout(user user.User, name string) {
 				<div class="navbar-menu">
 					<div class="navbar-end">
 						<a href="/admin" class="navbar-item">Admin</a>
-						if !user.IsAnonymous() {
+						if showLogout {
 							<a href="/logout" class="navbar-item">Logout</a>
 						}
 					</div>

@@ -2,13 +2,15 @@ package template
 
 import (
 	"github.com/ostcar/bietrunde/model"
-	"github.com/ostcar/bietrunde/user"
 )
 
-templ BieterEdit(user user.User, bieter model.Bieter) {
-	@layout(user, "Bietrunde - " + bieter.Name()) {
+templ BieterEdit(bieter model.Bieter, err string) {
+	@layout("Bietrunde - " + bieter.Name(), true) {
 		<div class="columns">
 			<form action="/edit" method="post">
+				if err != "" {
+					<p class="help is-danger">{ err }</p>
+				}
 				@formFieldName(bieter.Vorname, bieter.Nachname)
 				@formFieldMail(bieter.Mail)
 				@formFieldAdresse(bieter.Adresse)

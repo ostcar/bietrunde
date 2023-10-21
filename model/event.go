@@ -17,6 +17,8 @@ func GetEvent(eventType string) Event {
 		return &eventBieterCreate{}
 	case eventBieterUpdate{}.Name():
 		return &eventBieterUpdate{}
+	case eventBieterDelete{}.Name():
+		return &eventBieterDelete{}
 	default:
 		return nil
 	}
@@ -32,7 +34,7 @@ func (e eventBieterCreate) Name() string {
 
 func (e eventBieterCreate) Validate(model Model) error {
 	if _, ok := model.Bieter[e.ID]; ok {
-		return fmt.Errorf("bieter id is not unique")
+		return fmt.Errorf("Bieter id is not unique")
 	}
 
 	if model.State != StateRegistration {
