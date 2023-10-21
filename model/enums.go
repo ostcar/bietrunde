@@ -52,3 +52,47 @@ func (v Verteilstelle) ToAttr() string {
 		return "-"
 	}
 }
+
+// ServiceState is the state of the service.
+type ServiceState int
+
+// States of the service.
+const (
+	StateInvalid ServiceState = iota
+	StateRegistration
+	StateValidation
+	StateOffer
+)
+
+func (s ServiceState) String() string {
+	return [...]string{"0 - Ungültig", "1 - Registrierung", "2 - Überprüfung", "3 - Gebote"}[s]
+}
+
+// ToAttr converts to a attribute for select elements
+func (s ServiceState) ToAttr() string {
+	switch s {
+	case StateRegistration:
+		return "registration"
+	case StateValidation:
+		return "validation"
+	case StateOffer:
+		return "offer"
+	default:
+		return "-"
+	}
+}
+
+// StateFromAttr converts a attribute string representation to
+// ServiceState.
+func StateFromAttr(attr string) ServiceState {
+	switch attr {
+	case "registration":
+		return StateRegistration
+	case "validation":
+		return StateValidation
+	case "offer":
+		return StateOffer
+	default:
+		return StateInvalid
+	}
+}

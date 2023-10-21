@@ -5,10 +5,15 @@ import (
 	"github.com/ostcar/bietrunde/model"
 )
 
-templ Bieter( bieter model.Bieter) {
+templ Bieter(state model.ServiceState, bieter model.Bieter) {
 	@layout("Bietrunde - " + bieter.Name(), true) {
 		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
+		if state == model.StateOffer {
+			@gebotForm(bieter.Gebot)
+		} else if !bieter.Gebot.Empty() {
+			@gebotShow(bieter.Gebot)
+		}
 		<dl class="block">
 			<dt class="has-text-weight-bold">E-Mail:</dt>
 			<dd class="ml-5">
@@ -43,8 +48,32 @@ templ Bieter( bieter model.Bieter) {
 				@abbuchung(bieter.Jaehrlich)
 			</dd>
 		</dl>
-		<a href="/edit" class="block button is-primary">Bearbeiten</a>
+		if state == model.StateRegistration {
+			<a href="/edit" class="block button is-primary">Bearbeiten</a>
+		}
 	}
+}
+
+templ gebotShow(gebot model.Gebot) {
+	<div class="box">
+		<strong>Dein Gebot:</strong> { gebot.String() }
+	</div>
+}
+
+templ gebotForm(gebot model.Gebot) {
+	<form action="/" method="post">
+		<input type="hidden" name="form" value="gebot"/>
+		<div class="field is-grouped">
+			<p class="control is-expanded">
+				<input name="gebot" class="input" type="number" placeholder="Monatlicher Betrag" value={ gebot.NumberString() }/>
+			</p>
+			<p class="control">
+				<button class="button is-info" type="submit">
+					Abgeben
+				</button>
+			</p>
+		</div>
+	</form>
 }
 
 templ ddString(s string) {

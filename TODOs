@@ -1,0 +1,9 @@
+* Admin bieter detail
+* PDF
+* CSV-Export
+* Error handling in htmx views
+* Validate bieter edit
+* Bieten
+    * Bieten zurücksetzen
+    * autoupdate
+    * Gebot Parsen

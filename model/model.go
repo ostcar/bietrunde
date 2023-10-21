@@ -1,6 +1,35 @@
 package model
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+	"strconv"
+)
+
+// Gebot is an offer.
+type Gebot int
+
+func (g Gebot) String() string {
+	euro := int(g) / 100
+	cent := int(g) % 100
+	return fmt.Sprintf("%d,%02d €", euro, cent)
+}
+
+// NumberString returns a number for the form field.
+func (g Gebot) NumberString() string {
+	euro := int(g) / 100
+	cent := int(g) % 100
+
+	if cent == 0 {
+		return strconv.Itoa(euro)
+	}
+	return fmt.Sprintf("%d,%02d", euro, cent)
+}
+
+// Empty is true, if there is no offer.
+func (g Gebot) Empty() bool {
+	return int(g) == 0
+}
 
 // Bieter is a person that makes an offer.
 type Bieter struct {
@@ -15,7 +44,7 @@ type Bieter struct {
 	IBAN          string        `json:"iban"`
 	Kontoinhaber  string        `json:"kontoinhaber"`
 	Jaehrlich     bool          `json:"jaehrlich"`
-	Gebot         int           `json:"gebot"`
+	Gebot         Gebot         `json:"gebot"`
 }
 
 // Name returns the full name.
@@ -61,17 +90,7 @@ func (m Model) BieterDelete(id int) Event {
 	return eventBieterDelete{ID: id}
 }
 
-// ServiceState is the state of the service.
-type ServiceState int
-
-// States of the service.
-const (
-	StateInvalid ServiceState = iota
-	StateRegistration
-	StateValidation
-	StateOffer
-)
-
-func (s ServiceState) String() string {
-	return [...]string{"0 - Ungültig", "1 - Registrierung", "2 - Überprüfung", "3 - Gebote"}[s]
+// SetState deletes a bieter.
+func (m Model) SetState(state ServiceState) Event {
+	return eventStateSet{State: state}
 }

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"log"
 	"net"
 	"net/http"
 	"slices"
@@ -88,8 +89,9 @@ func (s *server) registerHandlers() {
 
 	router.Handle("/admin", handleError(s.adminPage(s.handleAdmin)))
 	router.Handle("/admin/new", handleError(s.adminPage(s.handleAdminNew)))
-	router.Handle("/admin/delete/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminDelete)))
 	router.Handle("/admin/edit/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminEdit)))
+	router.Handle("/admin/delete/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminDelete)))
+	router.Handle("/admin/state", handleError(s.adminPage(s.handleAdminState)))
 
 	s.Handler = loggingMiddleware(router)
 }
@@ -105,12 +107,13 @@ func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
 	m, done := s.model.ForReading()
 	user, _ := user.FromRequest(r, []byte(s.cfg.Secred))
 	bieter, ok := m.Bieter[user.BieterID]
+	state := m.State
 	done()
 
 	if user.IsAnonymous() || !ok {
 		return s.handleLoginPage(w, r)
 	}
-	return s.handleBieterDetail(w, r, bieter)
+	return s.handleBieterDetail(w, r, state, bieter)
 }
 
 func (s server) handleLoginPage(w http.ResponseWriter, r *http.Request) error {
@@ -158,11 +161,17 @@ func (s server) handleLoginPost(w http.ResponseWriter, r *http.Request) error {
 
 	user := user.FromID(bieterID)
 	user.SetCookie(w, []byte(s.cfg.Secred))
-	return s.handleBieterDetail(w, r, bieter)
+	return s.handleBieterDetail(w, r, state, bieter)
 }
 
 func (s server) handleRegisterPost(w http.ResponseWriter, r *http.Request) error {
 	m, write, done := s.model.ForWriting()
+
+	state := m.State
+	if state != model.StateRegistration {
+		done()
+		return template.LoginPage(m.State, "", "", "Registrierung nicht möglich").Render(r.Context(), w)
+	}
 
 	bieterID, event := m.BieterCreate()
 	if err := write(event); err != nil {
@@ -171,15 +180,16 @@ func (s server) handleRegisterPost(w http.ResponseWriter, r *http.Request) error
 	}
 
 	bieter := m.Bieter[bieterID]
+
 	done()
 
 	user := user.FromID(bieterID)
 	user.SetCookie(w, []byte(s.cfg.Secred))
-	return s.handleBieterDetail(w, r, bieter)
+	return s.handleBieterDetail(w, r, state, bieter)
 }
 
-func (s server) handleBieterDetail(w http.ResponseWriter, r *http.Request, bieter model.Bieter) error {
-	return template.Bieter(bieter).Render(r.Context(), w)
+func (s server) handleBieterDetail(w http.ResponseWriter, r *http.Request, state model.ServiceState, bieter model.Bieter) error {
+	return template.Bieter(state, bieter).Render(r.Context(), w)
 }
 
 func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
@@ -194,6 +204,11 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 		m, done := s.model.ForReading()
 		defer done()
 
+		if m.State != model.StateRegistration {
+			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+			return nil
+		}
+
 		bieter, ok := m.Bieter[user.BieterID]
 
 		if user.IsAnonymous() || !ok {
@@ -205,6 +220,11 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 	case http.MethodPost:
 		m, write, done := s.model.ForWriting()
 		defer done()
+
+		if m.State != model.StateRegistration {
+			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+			return nil
+		}
 
 		bieter, ok := m.Bieter[user.BieterID]
 		if !ok {
@@ -288,7 +308,7 @@ func (s server) handleAdmin(w http.ResponseWriter, r *http.Request) error {
 	defer done()
 
 	bieter := adminBieterList(m)
-	return template.Admin(bieter).Render(r.Context(), w)
+	return template.Admin(m.State, bieter).Render(r.Context(), w)
 }
 
 func adminBieterList(m model.Model) []model.Bieter {
@@ -322,7 +342,7 @@ func (s server) handleAdminNew(w http.ResponseWriter, r *http.Request) error {
 	bieterID, event := m.BieterCreate()
 	if err := write(event); err != nil {
 		// TODO
-		return nil
+		return err
 	}
 
 	bieter := m.Bieter[bieterID]
@@ -397,6 +417,28 @@ func (s server) handleAdminDelete(w http.ResponseWriter, r *http.Request) error 
 	return template.AdminUserTableBody(bieter).Render(r.Context(), w)
 }
 
+func (s server) handleAdminState(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Hier wird nur geupdated", http.StatusMethodNotAllowed)
+		return nil
+	}
+
+	m, write, done := s.model.ForWriting()
+	defer done()
+
+	if err := r.ParseForm(); err != nil {
+		// TODO: show to
+		return err
+	}
+	state := model.StateFromAttr(r.Form.Get("state"))
+	if err := write(m.SetState(state)); err != nil {
+		// TODO
+		return err
+	}
+
+	return template.AdminStateSelect(state).Render(r.Context(), w)
+}
+
 func handleStatic() http.Handler {
 	files, err := fs.Sub(publicFiles, "files")
 	if err != nil {
@@ -409,7 +451,7 @@ func handleStatic() http.Handler {
 func handleError(handler func(w http.ResponseWriter, r *http.Request) error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := handler(w, r); err != nil {
-			// TODO
+			log.Printf("Error: %v", err)
 			http.Error(w, err.Error(), 500)
 		}
 	}

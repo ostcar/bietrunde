@@ -5,7 +5,7 @@ import (
 	"github.com/ostcar/bietrunde/model"
 )
 
-templ Admin(bieter []model.Bieter) {
+templ Admin(state model.ServiceState, bieter []model.Bieter) {
 	@layout("Admin", true) {
 		<h1 class="title is-3">Admin</h1>
 		<table class="table">
@@ -18,18 +18,31 @@ templ Admin(bieter []model.Bieter) {
 			</thead>
 			@AdminUserTableBody(bieter)
 		</table>
-		<div class="buttons">
-			<div
- 				class="button"
- 				hx-post="/admin/new"
- 				hx-target="#admin-user-table-body"
- 				hx-swap="outerHTML"
-			>
-				Weiteren Bieter
-			</div>
+		<div
+ 			class="button"
+ 			hx-post="/admin/new"
+ 			hx-target="#admin-user-table-body"
+ 			hx-swap="outerHTML"
+		>
+			Weiteren Bieter
+		</div>
+		<div class="select">
+			@AdminStateSelect(state)
 		</div>
 		@AdminModalEmpty()
 	}
+}
+
+templ AdminStateSelect(state model.ServiceState) {
+	<select
+ 		name="state"
+ 		hx-post="/admin/state"
+ 		hx-swap="outerHTML"
+	>
+		<option selected?={ state == model.StateRegistration } value={ model.StateRegistration.ToAttr() }>Registrierung</option>
+		<option selected?={ state == model.StateValidation } value={ model.StateValidation.ToAttr() }>Überprüfung</option>
+		<option selected?={ state == model.StateOffer } value={ model.StateOffer.ToAttr() }>Bieten</option>
+	</select>
 }
 
 templ AdminUserTableBody(bieter []model.Bieter) {

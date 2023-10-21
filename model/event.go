@@ -19,6 +19,8 @@ func GetEvent(eventType string) Event {
 		return &eventBieterUpdate{}
 	case eventBieterDelete{}.Name():
 		return &eventBieterDelete{}
+	case eventStateSet{}.Name():
+		return &eventStateSet{}
 	default:
 		return nil
 	}
@@ -35,10 +37,6 @@ func (e eventBieterCreate) Name() string {
 func (e eventBieterCreate) Validate(model Model) error {
 	if _, ok := model.Bieter[e.ID]; ok {
 		return fmt.Errorf("Bieter id is not unique")
-	}
-
-	if model.State != StateRegistration {
-		return fmt.Errorf("Registrierung nicht möglich")
 	}
 
 	return nil
@@ -90,5 +88,26 @@ func (e eventBieterDelete) Validate(model Model) error {
 
 func (e eventBieterDelete) Execute(model Model, time time.Time) Model {
 	delete(model.Bieter, e.ID)
+	return model
+}
+
+type eventStateSet struct {
+	State ServiceState
+}
+
+func (e eventStateSet) Name() string {
+	return "set-state"
+}
+
+func (e eventStateSet) Validate(model Model) error {
+	if int(e.State) <= 0 || int(e.State) > 3 {
+		return fmt.Errorf("invalid state")
+	}
+
+	return nil
+}
+
+func (e eventStateSet) Execute(model Model, time time.Time) Model {
+	model.State = e.State
 	return model
 }
