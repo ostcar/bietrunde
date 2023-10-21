@@ -125,7 +125,16 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 		}
 
 		r.ParseForm()
-		bieter.Name = r.FormValue("name")
+		bieter.Vorname = r.Form.Get("vorname")
+		bieter.Nachname = r.Form.Get("nachname")
+		bieter.Mail = r.Form.Get("mail")
+		bieter.Adresse = r.Form.Get("adresse")
+		bieter.Mitglied = r.Form.Has("mitglied")
+		bieter.Verteilstelle = model.VerteilstelleFromAttr(r.Form.Get("verteilstelle"))
+		bieter.Teilpartner = r.Form.Get("teilpartner")
+		bieter.IBAN = r.Form.Get("iban")
+		bieter.Kontoinhaber = r.Form.Get("kontoinhaber")
+		bieter.Jaehrlich = r.Form.Get("abbuchung") == "jaehrlich"
 		if err := write(m.BieterUpdate(bieter)); err != nil {
 			return err
 		}

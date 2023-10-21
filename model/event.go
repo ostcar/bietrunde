@@ -15,6 +15,8 @@ func GetEvent(eventType string) Event {
 	switch eventType {
 	case eventBieterCreate{}.Name():
 		return &eventBieterCreate{}
+	case eventBieterUpdate{}.Name():
+		return &eventBieterUpdate{}
 	default:
 		return nil
 	}

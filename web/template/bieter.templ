@@ -6,8 +6,8 @@ import (
 )
 
 templ Bieter(bieter model.Bieter) {
-	@layout("Bietrunde - " + bieter.Name) {
-		<h1 class="title is-4">Hallo { bieter.Name }</h1>
+	@layout("Bietrunde - " + bieter.Name()) {
+		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
 		<dl class="block">
 			<dt class="has-text-weight-bold">E-Mail:</dt>
@@ -16,7 +16,7 @@ templ Bieter(bieter model.Bieter) {
 			</dd>
 			<dt class="has-text-weight-bold">Adresse:</dt>
 			<dd class="ml-5">
-				@ddString( bieter.Adresse)
+				@ddmultilineString(bieter.Adresse)
 			</dd>
 			<dt class="has-text-weight-bold">Mitglied:</dt>
 			<dd class="ml-5">
@@ -24,7 +24,7 @@ templ Bieter(bieter model.Bieter) {
 			</dd>
 			<dt class="has-text-weight-bold">Verteilstelle:</dt>
 			<dd class="ml-5">
-				@verteilstelle(bieter.Verteilstelle)
+				@ddString(bieter.Verteilstelle.String())
 			</dd>
 			<dt class="has-text-weight-bold">Teilpartner:</dt>
 			<dd class="ml-5">
@@ -36,7 +36,7 @@ templ Bieter(bieter model.Bieter) {
 			</dd>
 			<dt class="has-text-weight-bold">Kontoinhaber:</dt>
 			<dd class="ml-5">
-				@ddString( bieter.Kontoinhaber)
+				@ddString( bieter.ShowKontoinhaber())
 			</dd>
 			<dt class="has-text-weight-bold">Abbuchung:</dt>
 			<dd class="ml-5">
@@ -55,24 +55,19 @@ templ ddString(s string) {
 	}
 }
 
+templ ddmultilineString(s string) {
+	if s == "" {
+		-
+	} else {
+		<pre>{ s }</pre>
+	}
+}
+
 templ jaNein(m bool) {
 	if m {
 		Ja
 	} else {
 		Nein
-	}
-}
-
-templ verteilstelle(v int) {
-	switch v {
-		case 0:
-			-
-		case 1:
-			Villingen
-		case 2:
-			Schwenningen
-		case 3:
-			Überauchen
 	}
 }
 

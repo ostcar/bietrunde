@@ -5,81 +5,131 @@ import (
 )
 
 templ BieterEdit(bieter model.Bieter) {
-	@layout("Bietrunde - " + bieter.Name) {
+	@layout("Bietrunde - " + bieter.Name()) {
 		<div class="columns">
-			<form class="column is-half-desktop" action="/edit" method="post">
-				@formField("Name", "name")
-				@formFieldMail("E-Mail", "mail")
-				@formFieldMail("Adresse", "adresse")
-				@formFieldCheckbox("Mitglied", "mitglied")
-				@formVerteilstelle()
-				@formField("Teilpartner", "teilpartner")
-				@formField("IBAN", "iban")
-				@formField("Kontoinhaber", "kontoinhaber")
-				@formAbbuchung()
-				<div class="control">
-					<button class="button is-primary" type="submit">Speichern</button>
-					<a href="/" class="button is-danger">Abbrechen</a>
+			<form action="/edit" method="post">
+				@formFieldName(bieter.Vorname, bieter.Nachname)
+				@formFieldMail(bieter.Mail)
+				@formFieldAdresse(bieter.Adresse)
+				@formFieldMitglied(bieter.Mitglied)
+				@formFieldVerteilstelle(bieter.Verteilstelle)
+				@formFieldTeilpartner(bieter.Teilpartner)
+				@formFieldIBAN(bieter.IBAN)
+				@formFieldKontoinhaber(bieter.Kontoinhaber)
+				@formAbbuchung(bieter.Jaehrlich)
+				<div class="field is-grouped">
+					<div class="control">
+						<button class="button is-primary" type="submit">Speichern</button>
+					</div>
+					<div class="control">
+						<a href="/" class="button is-link is-light">Abbrechen</a>
+					</div>
 				</div>
 			</form>
 		</div>
 	}
 }
 
-templ formField(name string, attr string) {
-	@formFieldHelper(name, attr, "text")
-}
-
-templ formFieldMail(name string, attr string) {
-	@formFieldHelper(name, attr, "email")
-}
-
-templ formFieldCheckbox(name string, attr string) {
+templ formFieldName(vorname, nachname string) {
 	<div class="field">
+		<div class="field-body">
+			<div class="field">
+				<label class="label">Vorname</label>
+				<input name="vorname" class="input" type="text" placeholder="Vorname" value={ vorname }/>
+			</div>
+			<div class="field">
+				<label class="label">Nachname</label>
+				<input name="nachname" class="input" type="text" placeholder="Nachname" value={ nachname }/>
+			</div>
+		</div>
+	</div>
+}
+
+templ formFieldMail(mail string) {
+	<div class="field">
+		<label class="label">E-Mail</label>
+		<div class="control">
+			<input name="mail" class="input" type="text" placeholder="E-Mail" value={ mail }/>
+		</div>
+	</div>
+}
+
+templ formFieldAdresse(adresse string) {
+	<div class="field">
+		<label class="label">Adresse</label>
+		<div class="control">
+			<textarea name="adresse" class="textarea" placeholder="Musterstraße 13\n12345 Musterstadt">{ adresse }</textarea>
+		</div>
+	</div>
+}
+
+templ formFieldMitglied(mitglied bool) {
+	<div class="field">
+		<label class="label">Mitglied</label>
 		<div class="control">
 			<label class="checkbox">
-				<input name={ attr } type="checkbox"/>
-				{ name }
+				<input name="mitglied" type="checkbox" checked?={ mitglied }/>
+				Bieter <strong>und</strong> Teilpartner sind Mitglied.
 			</label>
 		</div>
 	</div>
 }
 
-templ formVerteilstelle() {
+templ formFieldVerteilstelle(v model.Verteilstelle) {
 	<div class="field">
 		<label class="label">Verteilstelle</label>
 		<div class="control">
 			<div class="select">
-				<select>
+				<select name="verteilstelle">
 					<option>-</option>
-					<option>Villingen</option>
-					<option>Schwenningen</option>
-					<option>Überauchen</option>
+					<option selected?={ v == model.VerteilstelleVillingen } value="villingen">Villingen</option>
+					<option selected?={ v == model.VerteilstelleSchwenningen } value="schwenningen">Schwenningen</option>
+					<option selected?={ v == model.VerteilstelleUeberauchen } value="ueberauchen">Überauchen</option>
 				</select>
 			</div>
 		</div>
 	</div>
 }
 
-templ formAbbuchung() {
+templ formFieldTeilpartner(partner string) {
+	<div class="field">
+		<label class="label">Teilpartner</label>
+		<div class="control">
+			<input name="teilpartner" class="input" type="text" placeholder="Vor- und Nachname" value={ partner }/>
+			<p class="help">Falls der Anteil geteilt wird: Name der anderen Person</p>
+		</div>
+	</div>
+}
+
+templ formFieldIBAN(iban string) {
+	<div class="field">
+		<label class="label">IBAN</label>
+		<div class="control">
+			<input name="iban" class="input" type="text" placeholder="DE12 3456" value={ iban }/>
+		</div>
+	</div>
+}
+
+templ formFieldKontoinhaber(inhaber string) {
+	<div class="field">
+		<label class="label">Kontoinhaber</label>
+		<div class="control">
+			<input name="kontoinhaber" class="input" type="text" placeholder="Vorname Nachname" value={ inhaber }/>
+			<p class="help">Wenn leer wird der Bietername verwendet</p>
+		</div>
+	</div>
+}
+
+templ formAbbuchung(jaehrlich bool) {
 	<div class="field">
 		<label class="label">Abbuchung</label>
 		<div class="control">
 			<div class="select">
-				<select>
-					<option>Monatlich</option>
-					<option>Jährlich</option>
+				<select name="abbuchung">
+					<option value="monatlich">Monatlich</option>
+					<option selected?={ jaehrlich } value="jaehrlich">Jährlich</option>
 				</select>
 			</div>
-		</div>
-	</div>
-}
-
-templ formFieldHelper(name string, attr string, type_ string) {
-	<div class="field">
-		<label class="label">{ name }</label>
-		<div class="control">
-			<input name={ attr } class="input" type={ type_ } placeholder={ name }/>
 		</div>
 	</div>
 }

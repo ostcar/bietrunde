@@ -4,17 +4,31 @@ import "math/rand"
 
 // Bieter is a person that makes an offer.
 type Bieter struct {
-	ID            int    `json:"id"`
-	Name          string `json:"name"`
-	Mail          string `json:"mail"`
-	Adresse       string `json:"adresse"`
-	Mitglied      bool   `json:"mitglied"`
-	Verteilstelle int    `json:"verteilstelle"`
-	Teilpartner   string `json:"teilpartner"`
-	IBAN          string `json:"iban"`
-	Kontoinhaber  string `json:"kontoinhaber"`
-	Jaehrlich     bool   `json:"jaehrlich"`
-	Gebot         int    `json:"gebot"`
+	ID            int           `json:"id"`
+	Vorname       string        `json:"vorname"`
+	Nachname      string        `json:"nachname"`
+	Mail          string        `json:"mail"`
+	Adresse       string        `json:"adresse"`
+	Mitglied      bool          `json:"mitglied"`
+	Verteilstelle Verteilstelle `json:"verteilstelle"`
+	Teilpartner   string        `json:"teilpartner"`
+	IBAN          string        `json:"iban"`
+	Kontoinhaber  string        `json:"kontoinhaber"`
+	Jaehrlich     bool          `json:"jaehrlich"`
+	Gebot         int           `json:"gebot"`
+}
+
+// Name returns the full name.
+func (b Bieter) Name() string {
+	return b.Vorname + " " + b.Nachname
+}
+
+// ShowKontoinhaber the kontoinhaber
+func (b Bieter) ShowKontoinhaber() string {
+	if b.Kontoinhaber != "" {
+		return b.Kontoinhaber
+	}
+	return b.Name()
 }
 
 // Model of the service.
