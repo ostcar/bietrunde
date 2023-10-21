@@ -5,14 +5,15 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
-	"log"
 	"net"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/ostcar/bietrunde/config"
 	"github.com/ostcar/bietrunde/model"
+	"github.com/ostcar/bietrunde/user"
 	"github.com/ostcar/bietrunde/web/template"
 	"github.com/ostcar/sticky"
 	"golang.org/x/exp/slog"
@@ -78,6 +79,8 @@ func (s *server) registerHandlers() {
 	router.PathPrefix("/assets").Handler(handleStatic())
 	router.Handle("/", handleError(s.handleHome))
 	router.Handle("/register", handleError(s.handleRegister))
+	router.Handle("/login", handleError(s.handleLogin))
+	router.Handle("/logout", handleError(s.handleLogout))
 	router.Handle("/edit", handleError(s.handleEdit))
 
 	s.Handler = loggingMiddleware(router)
@@ -87,54 +90,92 @@ func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
 	m, done := s.model.ForReading()
 	defer done()
 
-	bieterID := readAuthCookie(r)
-	bieter, ok := m.Bieter[bieterID]
+	// Ignore error and use anonymous instead.
+	user, _ := user.FromRequest(r, []byte(s.cfg.Secred))
 
-	if bieterID == 0 || !ok {
-		return template.LoginPage(m.State).Render(r.Context(), w)
+	bieter, ok := m.Bieter[user.BieterID]
+
+	if user.IsAnonymous() || !ok {
+		return template.LoginPage(user, m.State).Render(r.Context(), w)
 	}
 
-	return template.Bieter(bieter).Render(r.Context(), w)
+	return template.Bieter(user, bieter).Render(r.Context(), w)
 }
 
 func (s server) handleRegister(w http.ResponseWriter, r *http.Request) error {
 	m, write := s.model.ForWriting()
+	defer write()
 
-	id, event := m.BieterCreate()
-	write(event)
+	bieterID, event := m.BieterCreate()
+	if err := write(event); err != nil {
+		return err
+	}
 
-	log.Printf("set id %d", id)
-	setAuthCookie(w, id)
+	user := user.FromID(bieterID)
+	user.SetCookie(w, []byte(s.cfg.Secred))
 
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	return nil
 }
 
+func (s server) handleLogin(w http.ResponseWriter, r *http.Request) error {
+	m, done := s.model.ForReading()
+	defer done()
+
+	if err := r.ParseForm(); err != nil {
+		return err
+	}
+
+	bieterID, _ := strconv.Atoi(r.Form.Get("bietnumber"))
+	_, ok := m.Bieter[bieterID]
+	user := user.FromID(bieterID)
+	if user.IsAnonymous() || !ok {
+		return fmt.Errorf("invalid number")
+	}
+
+	user.SetCookie(w, []byte(s.cfg.Secred))
+
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	return nil
+}
+
+func (s server) handleLogout(w http.ResponseWriter, r *http.Request) error {
+	user.Logout(w)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	return nil
+}
+
 func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
+	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+	if err != nil {
+		return err
+	}
+
 	if r.Method == http.MethodPost {
 		if err := r.ParseForm(); err != nil {
 			return err
 		}
 
 		m, write := s.model.ForWriting()
-		bieterID := readAuthCookie(r)
-		bieter, ok := m.Bieter[bieterID]
+		defer write()
 
-		if bieterID == 0 || !ok {
-			return template.LoginPage(m.State).Render(r.Context(), w)
+		bieter, ok := m.Bieter[user.BieterID]
+
+		if user.IsAnonymous() || !ok {
+			return template.LoginPage(user, m.State).Render(r.Context(), w)
 		}
 
 		r.ParseForm()
-		bieter.Vorname = r.Form.Get("vorname")
-		bieter.Nachname = r.Form.Get("nachname")
-		bieter.Mail = r.Form.Get("mail")
-		bieter.Adresse = r.Form.Get("adresse")
+		bieter.Vorname = strings.TrimSpace(r.Form.Get("vorname"))
+		bieter.Nachname = strings.TrimSpace(r.Form.Get("nachname"))
+		bieter.Mail = strings.TrimSpace(r.Form.Get("mail"))
+		bieter.Adresse = strings.TrimSpace(r.Form.Get("adresse"))
 		bieter.Mitglied = r.Form.Has("mitglied")
-		bieter.Verteilstelle = model.VerteilstelleFromAttr(r.Form.Get("verteilstelle"))
-		bieter.Teilpartner = r.Form.Get("teilpartner")
-		bieter.IBAN = r.Form.Get("iban")
-		bieter.Kontoinhaber = r.Form.Get("kontoinhaber")
-		bieter.Jaehrlich = r.Form.Get("abbuchung") == "jaehrlich"
+		bieter.Verteilstelle = model.VerteilstelleFromAttr(strings.TrimSpace(r.Form.Get("verteilstelle")))
+		bieter.Teilpartner = strings.TrimSpace(r.Form.Get("teilpartner"))
+		bieter.IBAN = strings.TrimSpace(r.Form.Get("iban"))
+		bieter.Kontoinhaber = strings.TrimSpace(r.Form.Get("kontoinhaber"))
+		bieter.Jaehrlich = strings.TrimSpace(r.Form.Get("abbuchung")) == "jaehrlich"
 		if err := write(m.BieterUpdate(bieter)); err != nil {
 			return err
 		}
@@ -146,34 +187,13 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 	m, done := s.model.ForReading()
 	defer done()
 
-	bieterID := readAuthCookie(r)
-	bieter, ok := m.Bieter[bieterID]
+	bieter, ok := m.Bieter[user.BieterID]
 
-	if bieterID == 0 || !ok {
-		return template.LoginPage(m.State).Render(r.Context(), w)
+	if user.IsAnonymous() || !ok {
+		return template.LoginPage(user, m.State).Render(r.Context(), w)
 	}
 
-	return template.BieterEdit(bieter).Render(r.Context(), w)
-}
-
-func setAuthCookie(w http.ResponseWriter, id int) {
-	cookie := &http.Cookie{
-		Name:     cookieName,
-		Value:    strconv.Itoa(id),
-		HttpOnly: true,
-	}
-	http.SetCookie(w, cookie)
-}
-
-func readAuthCookie(r *http.Request) int {
-	cookie, err := r.Cookie(cookieName)
-	if err != nil {
-		return 0
-	}
-
-	// Ignore the error, since we want to return 0 on error anyway.
-	id, _ := strconv.Atoi(cookie.Value)
-	return id
+	return template.BieterEdit(user, bieter).Render(r.Context(), w)
 }
 
 func handleStatic() http.Handler {

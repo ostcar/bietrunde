@@ -1,9 +1,12 @@
 package template
 
-import "github.com/ostcar/bietrunde/model"
+import (
+	"github.com/ostcar/bietrunde/model"
+	"github.com/ostcar/bietrunde/user"
+)
 
-templ LoginPage(state model.ServiceState) {
-	@layout("login") {
+templ LoginPage(user user.User, state model.ServiceState) {
+	@layout(user,"login") {
 		<section class="box">
 			@login()
 		</section>

@@ -2,18 +2,19 @@ package template
 
 import (
 	"github.com/ostcar/bietrunde/model"
+	"github.com/ostcar/bietrunde/user"
 )
 
-templ BieterEdit(bieter model.Bieter) {
-	@layout("Bietrunde - " + bieter.Name()) {
+templ BieterEdit(user user.User, bieter model.Bieter) {
+	@layout(user, "Bietrunde - " + bieter.Name()) {
 		<div class="columns">
 			<form action="/edit" method="post">
 				@formFieldName(bieter.Vorname, bieter.Nachname)
 				@formFieldMail(bieter.Mail)
 				@formFieldAdresse(bieter.Adresse)
-				@formFieldMitglied(bieter.Mitglied)
 				@formFieldVerteilstelle(bieter.Verteilstelle)
 				@formFieldTeilpartner(bieter.Teilpartner)
+				@formFieldMitglied(bieter.Mitglied)
 				@formFieldIBAN(bieter.IBAN)
 				@formFieldKontoinhaber(bieter.Kontoinhaber)
 				@formAbbuchung(bieter.Jaehrlich)

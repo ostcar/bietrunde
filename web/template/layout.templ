@@ -1,6 +1,10 @@
 package template
 
-templ layout(name string) {
+import (
+	"github.com/ostcar/bietrunde/user"
+)
+
+templ layout(user user.User, name string) {
 	<!DOCTYPE html>
 	<html lang="de">
 		<head>
@@ -16,6 +20,18 @@ templ layout(name string) {
 			<script src="/assets/htmx.min.js"></script>
 		</head>
 		<body>
+			<nav class="navbar" role="navigation">
+				<div class="navbar-menu">
+					<div class="navbar-end">
+						if !user.IsAdmin {
+							<a href="/admin" class="navbar-item">Admin</a>
+						}
+						if !user.IsAnonymous() {
+							<a href="/logout" class="navbar-item">Logout</a>
+						}
+					</div>
+				</div>
+			</nav>
 			<main class="section column is-half-desktop">
 				{ children... }
 			</main>
