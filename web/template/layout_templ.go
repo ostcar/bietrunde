@@ -44,24 +44,18 @@ func layout(user user.User, name string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script></head><body><nav class=\"navbar\" role=\"navigation\"><div class=\"navbar-menu\"><div class=\"navbar-end\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script></head><body><nav class=\"navbar\" role=\"navigation\"><div class=\"navbar-menu\"><div class=\"navbar-end\"><a href=\"/admin\" class=\"navbar-item\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if !user.IsAdmin {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"/admin\" class=\"navbar-item\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Var4 := `Admin`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</a>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		templ_7745c5c3_Var4 := `Admin`
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</a> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
 		if !user.IsAnonymous() {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"/logout\" class=\"navbar-item\">")

@@ -1,0 +1,57 @@
+package template
+
+import (
+	"strconv"
+	"github.com/ostcar/bietrunde/user"
+	"github.com/ostcar/bietrunde/model"
+)
+
+templ Admin(user user.User, bieter []model.Bieter) {
+	@layout(user, "Admin") {
+		if user.IsAdmin {
+			@adminPage(bieter)
+		} else {
+			@adminLogin()
+		}
+	}
+}
+
+templ adminPage(bieter []model.Bieter) {
+	<h1 class="title is-3">Admin</h1>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Bietnummer</th>
+				<th>Name</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, bieter := range bieter {
+				<tr>
+					<th>{ strconv.Itoa(bieter.ID) }</th>
+					<th>{ bieter.Name() }</th>
+					<th>
+						<button class="button is-warning">✎</button>
+						<a href={ templ.URL("/admin/delete/"+ strconv.Itoa(bieter.ID)) } class="button is-danger">⌫</a>
+					</th>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+templ adminLogin() {
+	<h1 class="title is-3">Admin Login</h1>
+	<form action="/admin/login" method="post">
+		<div class="field">
+			<label class="label">Passwort:</label>
+			<div class="control">
+				<input name="password" class="input" type="password"/>
+			</div>
+		</div>
+		<div class="control">
+			<button class="button is-primary" type="submit">Anmelden</button>
+		</div>
+	</form>
+}

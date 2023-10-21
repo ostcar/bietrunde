@@ -69,3 +69,24 @@ func (e eventBieterUpdate) Execute(model Model, time time.Time) Model {
 	model.Bieter[e.ID] = e.Bieter
 	return model
 }
+
+type eventBieterDelete struct {
+	ID int `json:"id"`
+}
+
+func (e eventBieterDelete) Name() string {
+	return "bieter-delete"
+}
+
+func (e eventBieterDelete) Validate(model Model) error {
+	if _, ok := model.Bieter[e.ID]; !ok {
+		return fmt.Errorf("bieter does not exist")
+	}
+
+	return nil
+}
+
+func (e eventBieterDelete) Execute(model Model, time time.Time) Model {
+	delete(model.Bieter, e.ID)
+	return model
+}

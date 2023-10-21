@@ -23,9 +23,7 @@ templ layout(user user.User, name string) {
 			<nav class="navbar" role="navigation">
 				<div class="navbar-menu">
 					<div class="navbar-end">
-						if !user.IsAdmin {
-							<a href="/admin" class="navbar-item">Admin</a>
-						}
+						<a href="/admin" class="navbar-item">Admin</a>
 						if !user.IsAnonymous() {
 							<a href="/logout" class="navbar-item">Logout</a>
 						}

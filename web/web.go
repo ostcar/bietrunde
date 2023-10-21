@@ -1,12 +1,14 @@
 package web
 
 import (
+	"cmp"
 	"context"
 	"embed"
 	"fmt"
 	"io/fs"
 	"net"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -78,10 +80,15 @@ func (s *server) registerHandlers() {
 
 	router.PathPrefix("/assets").Handler(handleStatic())
 	router.Handle("/", handleError(s.handleHome))
+	router.Handle("/edit", handleError(s.handleEdit))
+
+	router.Handle("/admin", handleError(s.handleAdmin))
+	router.Handle("/admin/login", handleError(s.handleAdminLogin))
+	router.Handle("/admin/delete/{id:[0-9]+}", handleError(s.handleAdminDelete))
+
 	router.Handle("/register", handleError(s.handleRegister))
 	router.Handle("/login", handleError(s.handleLogin))
 	router.Handle("/logout", handleError(s.handleLogout))
-	router.Handle("/edit", handleError(s.handleEdit))
 
 	s.Handler = loggingMiddleware(router)
 }
@@ -100,49 +107,6 @@ func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return template.Bieter(user, bieter).Render(r.Context(), w)
-}
-
-func (s server) handleRegister(w http.ResponseWriter, r *http.Request) error {
-	m, write := s.model.ForWriting()
-	defer write()
-
-	bieterID, event := m.BieterCreate()
-	if err := write(event); err != nil {
-		return err
-	}
-
-	user := user.FromID(bieterID)
-	user.SetCookie(w, []byte(s.cfg.Secred))
-
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-	return nil
-}
-
-func (s server) handleLogin(w http.ResponseWriter, r *http.Request) error {
-	m, done := s.model.ForReading()
-	defer done()
-
-	if err := r.ParseForm(); err != nil {
-		return err
-	}
-
-	bieterID, _ := strconv.Atoi(r.Form.Get("bietnumber"))
-	_, ok := m.Bieter[bieterID]
-	user := user.FromID(bieterID)
-	if user.IsAnonymous() || !ok {
-		return fmt.Errorf("invalid number")
-	}
-
-	user.SetCookie(w, []byte(s.cfg.Secred))
-
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-	return nil
-}
-
-func (s server) handleLogout(w http.ResponseWriter, r *http.Request) error {
-	user.Logout(w)
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-	return nil
 }
 
 func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
@@ -194,6 +158,117 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return template.BieterEdit(user, bieter).Render(r.Context(), w)
+}
+
+func (s server) handleAdmin(w http.ResponseWriter, r *http.Request) error {
+	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+	if err != nil {
+		return err
+	}
+
+	m, done := s.model.ForReading()
+	defer done()
+
+	bieter := make([]model.Bieter, 0, len(m.Bieter))
+	for _, v := range m.Bieter {
+		bieter = append(bieter, v)
+	}
+	slices.SortFunc(bieter, func(a, b model.Bieter) int {
+		if c := cmp.Compare(a.Nachname, b.Nachname); c != 0 {
+			return c
+		}
+
+		if c := cmp.Compare(a.Vorname, b.Vorname); c != 0 {
+			return c
+		}
+
+		return cmp.Compare(a.ID, b.ID)
+	})
+
+	return template.Admin(user, bieter).Render(r.Context(), w)
+}
+
+func (s server) handleAdminLogin(w http.ResponseWriter, r *http.Request) error {
+	r.ParseForm()
+
+	pw := r.Form.Get("password")
+	if pw == s.cfg.AdminToken {
+		user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+		if err != nil {
+			return err
+		}
+		user.IsAdmin = true
+		user.SetCookie(w, []byte(s.cfg.Secred))
+	}
+
+	http.Redirect(w, r, "/admin", http.StatusTemporaryRedirect)
+	return nil
+}
+
+func (s server) handleAdminDelete(w http.ResponseWriter, r *http.Request) error {
+	// TODO: Make me a post
+	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+	if err != nil {
+		return err
+	}
+	if !user.IsAdmin {
+		http.Redirect(w, r, "/admin", http.StatusTemporaryRedirect)
+		return nil
+	}
+
+	m, write := s.model.ForWriting()
+	defer write()
+
+	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
+	if err := write(m.BieterDelete(bietID)); err != nil {
+		return err
+	}
+
+	http.Redirect(w, r, "/admin", http.StatusTemporaryRedirect)
+	return nil
+}
+
+func (s server) handleRegister(w http.ResponseWriter, r *http.Request) error {
+	m, write := s.model.ForWriting()
+	defer write()
+
+	bieterID, event := m.BieterCreate()
+	if err := write(event); err != nil {
+		return err
+	}
+
+	user := user.FromID(bieterID)
+	user.SetCookie(w, []byte(s.cfg.Secred))
+
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	return nil
+}
+
+func (s server) handleLogin(w http.ResponseWriter, r *http.Request) error {
+	m, done := s.model.ForReading()
+	defer done()
+
+	if err := r.ParseForm(); err != nil {
+		return err
+	}
+
+	bieterID, _ := strconv.Atoi(r.Form.Get("bietnumber"))
+	_, ok := m.Bieter[bieterID]
+	user := user.FromID(bieterID)
+	if user.IsAnonymous() || !ok {
+		return fmt.Errorf("invalid number")
+	}
+
+	user.SetCookie(w, []byte(s.cfg.Secred))
+
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	return nil
+}
+
+func (s server) handleLogout(w http.ResponseWriter, r *http.Request) error {
+	user.Logout(w)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	return nil
 }
 
 func handleStatic() http.Handler {

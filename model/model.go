@@ -56,6 +56,11 @@ func (m Model) BieterUpdate(bieter Bieter) Event {
 	return eventBieterUpdate{bieter}
 }
 
+// BieterDelete deletes a bieter.
+func (m Model) BieterDelete(id int) Event {
+	return eventBieterDelete{ID: id}
+}
+
 // ServiceState is the state of the service.
 type ServiceState int
 
