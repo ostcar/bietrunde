@@ -128,3 +128,8 @@ func (m Model) SetState(state ServiceState) Event {
 func (m Model) SetGebot(bietID int, gebot Gebot) Event {
 	return eventGebot{BietID: bietID, Gebot: gebot}
 }
+
+// ResetGebot sets all gebote to 0.
+func (m Model) ResetGebot() Event {
+	return eventResetGebot{}
+}

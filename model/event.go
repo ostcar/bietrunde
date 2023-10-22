@@ -23,6 +23,8 @@ func GetEvent(eventType string) Event {
 		return &eventStateSet{}
 	case eventGebot{}.Name():
 		return &eventGebot{}
+	case eventResetGebot{}.Name():
+		return &eventResetGebot{}
 	default:
 		return nil
 	}
@@ -135,5 +137,23 @@ func (e eventGebot) Execute(model Model, time time.Time) Model {
 	bieter := model.Bieter[e.BietID]
 	bieter.Gebot = e.Gebot
 	model.Bieter[e.BietID] = bieter
+	return model
+}
+
+type eventResetGebot struct{}
+
+func (e eventResetGebot) Name() string {
+	return "gebot-reset"
+}
+
+func (e eventResetGebot) Validate(model Model) error {
+	return nil
+}
+
+func (e eventResetGebot) Execute(model Model, time time.Time) Model {
+	for k, bieter := range model.Bieter {
+		bieter.Gebot = 0
+		model.Bieter[k] = bieter
+	}
 	return model
 }

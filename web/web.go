@@ -92,6 +92,7 @@ func (s *server) registerHandlers() {
 	router.Handle("/admin/edit/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminEdit)))
 	router.Handle("/admin/delete/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminDelete)))
 	router.Handle("/admin/state", handleError(s.adminPage(s.handleAdminState)))
+	router.Handle("/admin/reset-gebot", handleError(s.adminPage(s.handleAdminResetGebot)))
 
 	s.Handler = loggingMiddleware(router)
 }
@@ -443,6 +444,23 @@ func (s server) handleAdminDelete(w http.ResponseWriter, r *http.Request) error 
 
 	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
 	if err := write(m.BieterDelete(bietID)); err != nil {
+		return err
+	}
+
+	bieter := adminBieterList(m)
+	return template.AdminUserTable(bieter).Render(r.Context(), w)
+}
+
+func (s server) handleAdminResetGebot(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodDelete {
+		http.Error(w, "Hier wird nur gelöscht", http.StatusMethodNotAllowed)
+		return nil
+	}
+
+	m, write, done := s.model.ForWriting()
+	defer done()
+
+	if err := write(m.ResetGebot()); err != nil {
 		return err
 	}
 

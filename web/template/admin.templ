@@ -34,6 +34,10 @@ func averageGebot(bieter []model.Bieter) model.Gebot {
 		gebotCount++
 	}
 
+	if gebotCount == 0 {
+		return 0
+	}
+
 	return gebotSum / model.Gebot(gebotCount)
 }
 
@@ -53,15 +57,24 @@ templ Admin(state model.ServiceState, bieter []model.Bieter) {
 		@AdminUserTable(bieter)
 		<div class="box">
 			<div
- 				class="button"
+ 				class="button is-primary"
  				hx-post="/admin/new"
  				hx-target="#admin-user-table"
  				hx-swap="outerHTML"
 			>
-				Weiteren Bieter
+				Bieter Hinzufügen
 			</div>
 			<div class="select">
 				@AdminStateSelect(state)
+			</div>
+			<div
+ 				class="button is-danger"
+ 				hx-delete="/admin/reset-gebot"
+ 				hx-target="#admin-user-table"
+ 				hx-swap="outerHTML"
+ 				hx-confirm="Wirklich alle Gebote zurücksetzen?"
+			>
+				Neue Bietrunde
 			</div>
 		</div>
 		@AdminModalEmpty()
@@ -71,6 +84,7 @@ templ Admin(state model.ServiceState, bieter []model.Bieter) {
 templ AdminStateSelect(state model.ServiceState) {
 	<select
  		name="state"
+ 		class="button is-info"
  		hx-post="/admin/state"
  		hx-swap="outerHTML"
 	>
