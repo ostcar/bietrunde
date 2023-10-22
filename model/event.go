@@ -21,6 +21,8 @@ func GetEvent(eventType string) Event {
 		return &eventBieterDelete{}
 	case eventStateSet{}.Name():
 		return &eventStateSet{}
+	case eventGebot{}.Name():
+		return &eventGebot{}
 	default:
 		return nil
 	}
@@ -109,5 +111,29 @@ func (e eventStateSet) Validate(model Model) error {
 
 func (e eventStateSet) Execute(model Model, time time.Time) Model {
 	model.State = e.State
+	return model
+}
+
+type eventGebot struct {
+	BietID int   `json:"bieter"`
+	Gebot  Gebot `json:"gebot"`
+}
+
+func (e eventGebot) Name() string {
+	return "gebot"
+}
+
+func (e eventGebot) Validate(model Model) error {
+	if _, ok := model.Bieter[e.BietID]; !ok {
+		return fmt.Errorf("bieter does not exist")
+	}
+
+	return nil
+}
+
+func (e eventGebot) Execute(model Model, time time.Time) Model {
+	bieter := model.Bieter[e.BietID]
+	bieter.Gebot = e.Gebot
+	model.Bieter[e.BietID] = bieter
 	return model
 }

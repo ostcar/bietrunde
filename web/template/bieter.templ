@@ -5,15 +5,11 @@ import (
 	"github.com/ostcar/bietrunde/model"
 )
 
-templ Bieter(state model.ServiceState, bieter model.Bieter) {
+templ Bieter(state model.ServiceState, bieter model.Bieter, err string) {
 	@layout("Bietrunde - " + bieter.Name(), true) {
 		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
-		if state == model.StateOffer {
-			@gebotForm(bieter.Gebot)
-		} else if !bieter.Gebot.Empty() {
-			@gebotShow(bieter.Gebot)
-		}
+		@gebotShow(state,bieter.Gebot, err)
 		<dl class="block">
 			<dt class="has-text-weight-bold">E-Mail:</dt>
 			<dd class="ml-5">
@@ -54,26 +50,48 @@ templ Bieter(state model.ServiceState, bieter model.Bieter) {
 	}
 }
 
-templ gebotShow(gebot model.Gebot) {
-	<div class="box">
-		<strong>Dein Gebot:</strong> { gebot.String() }
-	</div>
+templ gebotShow(state model.ServiceState, gebot model.Gebot, err string) {
+	if state == model.StateOffer || !gebot.Empty() {
+		<div class="box">
+			<p class="block"><strong>Dein Gebot:</strong> { gebot.String() }</p>
+			if state == model.StateOffer {
+				@gebotForm(gebot, err)
+			}
+		</div>
+	}
 }
 
-templ gebotForm(gebot model.Gebot) {
-	<form action="/" method="post">
-		<input type="hidden" name="form" value="gebot"/>
-		<div class="field is-grouped">
-			<p class="control is-expanded">
-				<input name="gebot" class="input" type="number" placeholder="Monatlicher Betrag" value={ gebot.NumberString() }/>
-			</p>
-			<p class="control">
-				<button class="button is-info" type="submit">
-					Abgeben
-				</button>
-			</p>
-		</div>
-	</form>
+templ gebotForm(gebot model.Gebot, err string) {
+	<div class="block">
+		<p>Bitte gebe dein Gebot ab</p>
+		<form action="/" method="post">
+			<input type="hidden" name="form" value="gebot"/>
+			<div class="field is-grouped">
+				<p class="control is-expanded">
+					<input
+ 						name="gebot"
+ 						class="input"
+ 						type="number"
+ 						placeholder="Monatlicher Betrag"
+ 						value={ gebot.NumberString() }
+ 						step="0.01"
+					/>
+				</p>
+				<p class="control">
+					<button class="button is-info" type="submit">
+						if gebot.Empty() {
+							Abgeben
+						} else {
+							Ändern
+						}
+					</button>
+				</p>
+			</div>
+			if err != "" {
+				<p class="help is-danger">{ err }</p>
+			}
+		</form>
+	</div>
 }
 
 templ ddString(s string) {

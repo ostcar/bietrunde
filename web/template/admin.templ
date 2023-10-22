@@ -5,29 +5,64 @@ import (
 	"github.com/ostcar/bietrunde/model"
 )
 
+func bieterWithName(bieter []model.Bieter) string {
+	var count int
+	for _, b := range bieter {
+		if b.Name() != "" {
+			count++
+		}
+	}
+	return strconv.Itoa(count)
+}
+
+func gesamtGebot(bieter []model.Bieter) model.Gebot {
+	var count model.Gebot
+	for _, b := range bieter {
+		count += b.Gebot
+	}
+	return count
+}
+
+func averageGebot(bieter []model.Bieter) model.Gebot {
+	var gebotSum model.Gebot
+	var gebotCount int
+	for _, b := range bieter {
+		if b.Gebot.Empty() {
+			continue
+		}
+		gebotSum += b.Gebot
+		gebotCount++
+	}
+
+	return gebotSum / model.Gebot(gebotCount)
+}
+
+func gebotCount(bieter []model.Bieter) string {
+	var gebotCount int
+	for _, b := range bieter {
+		if !b.Gebot.Empty() {
+			gebotCount++
+		}
+	}
+	return strconv.Itoa(gebotCount)
+}
+
 templ Admin(state model.ServiceState, bieter []model.Bieter) {
 	@layout("Admin", true) {
 		<h1 class="title is-3">Admin</h1>
-		<table class="table">
-			<thead>
-				<tr>
-					<th>Bietnummer</th>
-					<th>Name</th>
-					<th></th>
-				</tr>
-			</thead>
-			@AdminUserTableBody(bieter)
-		</table>
-		<div
- 			class="button"
- 			hx-post="/admin/new"
- 			hx-target="#admin-user-table-body"
- 			hx-swap="outerHTML"
-		>
-			Weiteren Bieter
-		</div>
-		<div class="select">
-			@AdminStateSelect(state)
+		@AdminUserTable(bieter)
+		<div class="box">
+			<div
+ 				class="button"
+ 				hx-post="/admin/new"
+ 				hx-target="#admin-user-table"
+ 				hx-swap="outerHTML"
+			>
+				Weiteren Bieter
+			</div>
+			<div class="select">
+				@AdminStateSelect(state)
+			</div>
 		</div>
 		@AdminModalEmpty()
 	}
@@ -45,29 +80,51 @@ templ AdminStateSelect(state model.ServiceState) {
 	</select>
 }
 
-templ AdminUserTableBody(bieter []model.Bieter) {
-	<tbody id="admin-user-table-body">
-		for _, bieter := range bieter {
-			<tr>
-				<th>{ strconv.Itoa(bieter.ID) }</th>
-				<th>{ bieter.Name() }</th>
-				<th>
-					<button
- 						class="button is-warning is-small"
- 						hx-get={ "/admin/edit/"+ strconv.Itoa(bieter.ID) }
- 						hx-swap="none"
-					>✎</button>
-					<button
- 						class="button is-danger is-small"
- 						hx-delete={ "/admin/delete/"+ strconv.Itoa(bieter.ID) }
- 						hx-confirm={ bieter.Name() + " wirklich löschen?" }
- 						hx-target="#admin-user-table-body"
- 						hx-swap="outerHTML"
-					>🗑</button>
-				</th>
-			</tr>
-		}
-	</tbody>
+templ AdminUserTable(bieter []model.Bieter) {
+	<div id="admin-user-table">
+		<table class="table box">
+			<thead>
+				<tr>
+					<th>Bietnummer</th>
+					<th>Name</th>
+					<th>Gebot</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, bieter := range bieter {
+					<tr>
+						<th>{ strconv.Itoa(bieter.ID) }</th>
+						<th>{ bieter.Name() }</th>
+						<th>{ bieter.Gebot.String() }</th>
+						<th>
+							<button
+ 								class="button is-warning is-small"
+ 								hx-get={ "/admin/edit/"+ strconv.Itoa(bieter.ID) }
+ 								hx-swap="none"
+							>✎</button>
+							<button
+ 								class="button is-danger is-small"
+ 								hx-delete={ "/admin/delete/"+ strconv.Itoa(bieter.ID) }
+ 								hx-confirm={ bieter.Name() + " wirklich löschen?" }
+ 								hx-target="#admin-user-table"
+ 								hx-swap="outerHTML"
+							>🗑</button>
+						</th>
+					</tr>
+				}
+			</tbody>
+		</table>
+		<div class="box">
+			<ul>
+				<li>Es gibt <strong>{ strconv. Itoa(len(bieter )) }</strong> Bieter.</li>
+				<li>Davon <strong>{ bieterWithName(bieter) }</strong> mit Namen.</li>
+				<li>Es wurden <strong>{ gebotCount(bieter) }</strong> abgegeben.</li>
+				<li>Das gesamte Gebot ist <strong>{ gesamtGebot(bieter).String() }</strong>.</li>
+				<li>Das durchschnittliche Gebot liegt bei <strong>{ averageGebot(bieter).String() }</strong>.</li>
+			</ul>
+		</div>
+	</div>
 }
 
 templ AdminBieterEdit(bieter model.Bieter, err string) {
@@ -90,7 +147,7 @@ templ adminModal(title string, postURL string) {
 		<div class="modal-background"></div>
 		<form
  			hx-post={ postURL }
- 			hx-target="#admin-user-table-body"
+ 			hx-target="#admin-user-table"
  			hx-swap="outerHTML"
 		>
 			<div class="modal-card">

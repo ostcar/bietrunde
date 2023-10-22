@@ -4,12 +4,16 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"strings"
 )
 
 // Gebot is an offer.
 type Gebot int
 
 func (g Gebot) String() string {
+	if g == 0 {
+		return "-"
+	}
 	euro := int(g) / 100
 	cent := int(g) % 100
 	return fmt.Sprintf("%d,%02d €", euro, cent)
@@ -24,6 +28,28 @@ func (g Gebot) NumberString() string {
 		return strconv.Itoa(euro)
 	}
 	return fmt.Sprintf("%d,%02d", euro, cent)
+}
+
+// GebotFromString parses a string into an gebot.
+func GebotFromString(str string) (Gebot, error) {
+	euroStr, centStr, hasCent := strings.Cut(str, ".")
+	euro, err := strconv.Atoi(euroStr)
+	if err != nil {
+		return 0, fmt.Errorf("euro has to be a number")
+	}
+
+	cent := 0
+	if hasCent {
+
+		cent, err = strconv.Atoi(centStr)
+		if err != nil {
+			return 0, fmt.Errorf("cent has to be a number")
+		}
+		if len(centStr) == 1 {
+			cent *= 10
+		}
+	}
+	return Gebot(euro*100 + cent), nil
 }
 
 // Empty is true, if there is no offer.
@@ -49,6 +75,9 @@ type Bieter struct {
 
 // Name returns the full name.
 func (b Bieter) Name() string {
+	if len(b.Vorname)+len(b.Nachname) == 0 {
+		return ""
+	}
 	return b.Vorname + " " + b.Nachname
 }
 
@@ -90,7 +119,12 @@ func (m Model) BieterDelete(id int) Event {
 	return eventBieterDelete{ID: id}
 }
 
-// SetState deletes a bieter.
+// SetState sets the service state.
 func (m Model) SetState(state ServiceState) Event {
 	return eventStateSet{State: state}
+}
+
+// SetGebot sets the gebot for an user.
+func (m Model) SetGebot(bietID int, gebot Gebot) Event {
+	return eventGebot{BietID: bietID, Gebot: gebot}
 }

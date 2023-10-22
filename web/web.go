@@ -189,7 +189,40 @@ func (s server) handleRegisterPost(w http.ResponseWriter, r *http.Request) error
 }
 
 func (s server) handleBieterDetail(w http.ResponseWriter, r *http.Request, state model.ServiceState, bieter model.Bieter) error {
-	return template.Bieter(state, bieter).Render(r.Context(), w)
+	switch r.Method {
+	case http.MethodGet:
+		return template.Bieter(state, bieter, "").Render(r.Context(), w)
+
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			return template.Bieter(state, bieter, "Formular kann nicht gelesen werden. Bitte versuche es erneut.").Render(r.Context(), w)
+		}
+
+		if r.Form.Get("form") != "gebot" {
+			return template.Bieter(state, bieter, "").Render(r.Context(), w)
+		}
+
+		gebot, err := model.GebotFromString(r.Form.Get("gebot"))
+		if err != nil {
+			return template.Bieter(state, bieter, "Dein Gebot muss eine Zahl sein.").Render(r.Context(), w)
+		}
+
+		m, write, done := s.model.ForWriting()
+		defer done()
+
+		if err := write(m.SetGebot(bieter.ID, gebot)); err != nil {
+			return template.Bieter(state, bieter, userError(err)).Render(r.Context(), w)
+		}
+
+		bieter = m.Bieter[bieter.ID]
+
+		return template.Bieter(state, bieter, "").Render(r.Context(), w)
+
+	default:
+		http.Error(w, "Fehler", http.StatusMethodNotAllowed)
+		return nil
+
+	}
 }
 
 func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
@@ -348,7 +381,7 @@ func (s server) handleAdminNew(w http.ResponseWriter, r *http.Request) error {
 	bieter := m.Bieter[bieterID]
 	_ = bieter
 
-	template.AdminUserTableBody(adminBieterList(m)).Render(r.Context(), w)
+	template.AdminUserTable(adminBieterList(m)).Render(r.Context(), w)
 	template.AdminBieterEdit(bieter, "").Render(r.Context(), w)
 
 	return nil
@@ -391,7 +424,7 @@ func (s server) handleAdminEdit(w http.ResponseWriter, r *http.Request) error {
 		}
 
 		template.AdminModalEmpty().Render(r.Context(), w)
-		return template.AdminUserTableBody(adminBieterList(m)).Render(r.Context(), w)
+		return template.AdminUserTable(adminBieterList(m)).Render(r.Context(), w)
 
 	default:
 		http.Error(w, "Fehler", http.StatusMethodNotAllowed)
@@ -414,7 +447,7 @@ func (s server) handleAdminDelete(w http.ResponseWriter, r *http.Request) error 
 	}
 
 	bieter := adminBieterList(m)
-	return template.AdminUserTableBody(bieter).Render(r.Context(), w)
+	return template.AdminUserTable(bieter).Render(r.Context(), w)
 }
 
 func (s server) handleAdminState(w http.ResponseWriter, r *http.Request) error {
