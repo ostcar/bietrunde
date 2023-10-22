@@ -6,6 +6,7 @@ require (
 	github.com/a-h/templ v0.2.408
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/gorilla/mux v1.8.0
+	github.com/johnfercher/maroto/v2 v2.0.0-alpha.41
 	github.com/ostcar/sticky v0.0.0-20231020174652-ff503f2202a3
 	github.com/pelletier/go-toml/v2 v2.1.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
@@ -18,7 +19,6 @@ require (
 	github.com/hhrutter/lzw v1.0.0 // indirect
 	github.com/hhrutter/tiff v1.0.1 // indirect
 	github.com/johnfercher/go-tree v1.0.5 // indirect
-	github.com/johnfercher/maroto/v2 v2.0.0-alpha.41 // indirect
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/pdfcpu/pdfcpu v0.5.0 // indirect

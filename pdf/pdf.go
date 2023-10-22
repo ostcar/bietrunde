@@ -92,7 +92,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 			fmt.Sprintf(`Ich hole meinen Antreil in der Verteilstelle in %s.`, bieter.Verteilstelle.String()),
 		),
 		text.NewRow(5,
-			fmt.Sprintf(`Die Abbuchung meines Beitrages für den Ernteanteil erfolgt von April 2022 bis März 2023 %s.`, abbuchung),
+			fmt.Sprintf(`Die Abbuchung meines Beitrages für den Ernteanteil erfolgt von April 2024 bis März 2025 %s.`, abbuchung),
 		),
 
 		// Datum Unterschrift

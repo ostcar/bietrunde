@@ -106,8 +106,15 @@ func (s server) handleLogout(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
+	// u, _ := user.FromRequest(r, []byte(s.cfg.Secred))
+	// if bietID := r.URL.Query().Get("biet-id"); bietID != "" {
+	// 	id, _ := strconv.Atoi(bietID)
+	// 	u = user.FromID(id)
+	// }
+
 	m, done := s.model.ForReading()
 	user, _ := user.FromRequest(r, []byte(s.cfg.Secred))
+
 	bieter, ok := m.Bieter[user.BieterID]
 	state := m.State
 	done()
