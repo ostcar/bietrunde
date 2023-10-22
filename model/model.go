@@ -89,6 +89,12 @@ func (b Bieter) ShowKontoinhaber() string {
 	return b.Name()
 }
 
+// Valid tells, if all the bieter data is correct.
+func (b Bieter) Valid() bool {
+	// TODO
+	return true
+}
+
 // Model of the service.
 type Model struct {
 	Bieter map[int]Bieter

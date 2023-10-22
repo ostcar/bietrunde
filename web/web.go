@@ -17,6 +17,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/ostcar/bietrunde/config"
 	"github.com/ostcar/bietrunde/model"
+	"github.com/ostcar/bietrunde/pdf"
 	"github.com/ostcar/bietrunde/user"
 	"github.com/ostcar/bietrunde/web/template"
 	"github.com/ostcar/sticky"
@@ -85,7 +86,7 @@ func (s *server) registerHandlers() {
 
 	router.Handle("/", handleError(s.handleHome))
 	router.Handle("/edit", handleError(s.handleEdit))
-	// TODO: PDF, Gebot
+	router.Handle("/vertrag", handleError(s.handleVertrag))
 
 	router.Handle("/admin", handleError(s.adminPage(s.handleAdmin)))
 	router.Handle("/admin/new", handleError(s.adminPage(s.handleAdminNew)))
@@ -282,6 +283,32 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 		http.Error(w, "Fehler", http.StatusMethodNotAllowed)
 		return nil
 	}
+}
+
+func (s server) handleVertrag(w http.ResponseWriter, r *http.Request) error {
+	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+	if err != nil || user.BieterID == 0 {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return nil
+	}
+
+	m, done := s.model.ForReading()
+	defer done()
+
+	bieter, ok := m.Bieter[user.BieterID]
+
+	if user.IsAnonymous() || !ok {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return nil
+	}
+
+	vertrag, err := pdf.Bietervertrag("test", bieter)
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Write(vertrag)
+	return err
 }
 
 func parseBieterEdit(r *http.Request, bieter model.Bieter) (model.Bieter, string) {

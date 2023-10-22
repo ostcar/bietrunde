@@ -133,7 +133,7 @@ templ AdminUserTable(bieter []model.Bieter) {
 			<ul>
 				<li>Es gibt <strong>{ strconv. Itoa(len(bieter )) }</strong> Bieter.</li>
 				<li>Davon <strong>{ bieterWithName(bieter) }</strong> mit Namen.</li>
-				<li>Es wurden <strong>{ gebotCount(bieter) }</strong> abgegeben.</li>
+				<li>Es wurden <strong>{ gebotCount(bieter) }</strong> Gebote abgegeben.</li>
 				<li>Das gesamte Gebot ist <strong>{ gesamtGebot(bieter).String() }</strong>.</li>
 				<li>Das durchschnittliche Gebot liegt bei <strong>{ averageGebot(bieter).String() }</strong>.</li>
 			</ul>

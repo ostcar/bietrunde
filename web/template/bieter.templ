@@ -10,6 +10,17 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string) {
 		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
 		@gebotShow(state,bieter.Gebot, err)
+		<p class="block">
+			<strong>
+				if bieter.Valid() {
+					Bitte drucke vor der Bietrunde den <a href="/vertrag" target="_blank">Vertrag</a> aus und bringe ihn mit!
+				} else if state == model.StateRegistration {
+					Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
+				} else {
+					Deine Daten sind nicht valide. Bitte setze dich mit dem Vorstand in Verbindung.
+				}
+			</strong>
+		</p>
 		<dl class="block">
 			<dt class="has-text-weight-bold">E-Mail:</dt>
 			<dd class="ml-5">

@@ -1,7 +1,13 @@
-* Admin bieter detail
-* PDF
+# Zwingend
+
 * CSV-Export
+* User validieren und invalide User in admin page hervorheben.
+* Gebot auf Admin Seite verstecken?
+
+# Optional
+
+* Admin bieter detail
 * Error handling in htmx views
 * Validate bieter edit
-* Bieten
-    * autoupdate
+* Bieten autoupdate
+* QR Code routing vom PDF
