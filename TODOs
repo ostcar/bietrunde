@@ -6,9 +6,7 @@
 # Optional
 
 * Error handling in htmx views
-* Bieten autoupdate
 * Post Redirect Get
-* README auffrischen
 * Auto detect base url
 * Weiterer status Fertig -> Zeige bei Jährlich Betrag mal 12 an und fordere auf diesen Eintragen
 

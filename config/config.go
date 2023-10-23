@@ -21,7 +21,7 @@ type Config struct {
 // defaultConfig returns a config object with default values.
 func defaultConfig() Config {
 	return Config{
-		WebListenAddr: ":8080",
+		WebListenAddr: "localhost:8080",
 		AdminToken:    CreatePassword(8),
 		Secred:        CreatePassword(32),
 		BaseURL:       "http://localhost",
