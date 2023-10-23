@@ -34,7 +34,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 	abbuchungBetrag := bieter.Gebot.String()
 	if bieter.Jaehrlich {
 		abbuchung = "Jährlich"
-		abbuchungText = "Die Abbuchung erfolgt am 1. April 2024"
+		abbuchungText = "Die Abbuchung erfolgt am 1. Werktag im April 2024"
 		abbuchungBetrag = (bieter.Gebot * 12).String()
 	}
 
@@ -53,7 +53,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 				text.New("78056 Villingen-Schwenningen", props.Text{Size: 10, Top: 10.5}),
 				text.New("www.baarfood.de", props.Text{Size: 10, Top: 14}),
 			),
-			code.NewQrCol(3, fmt.Sprintf("%s/bieter/%d", domain, bieter.ID)),
+			code.NewQrCol(3, fmt.Sprintf("%s?biet-id=%d", domain, bieter.ID)),
 			image.NewFromBytesCol(3, headerImage, extension.Png, props.Rect{Center: true}),
 		),
 
@@ -89,7 +89,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 			Erst ab diesem Zeitpunkt erfolgt der Lastschrifteinzug von diesem neuen Mitglied.`,
 		),
 		text.NewRow(5,
-			fmt.Sprintf(`Ich hole meinen Antreil in der Verteilstelle in %s.`, bieter.Verteilstelle.String()),
+			fmt.Sprintf(`Ich hole meinen Anteil in der Verteilstelle in %s ab.`, bieter.Verteilstelle.String()),
 		),
 		text.NewRow(5,
 			fmt.Sprintf(`Die Abbuchung meines Beitrages für den Ernteanteil erfolgt von April 2024 bis März 2025 %s.`, abbuchung),

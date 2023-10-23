@@ -13,10 +13,9 @@ import (
 // Config holds all settings to start the server
 type Config struct {
 	WebListenAddr string `toml:"web_listen_addr"`
-
-	AdminToken string `toml:"admin_token"`
-
-	Secred string `toml:"secred"`
+	AdminToken    string `toml:"admin_token"`
+	Secred        string `toml:"secred"`
+	BaseURL       string `toml:"base_url"`
 }
 
 // defaultConfig returns a config object with default values.
@@ -25,6 +24,7 @@ func defaultConfig() Config {
 		WebListenAddr: ":8080",
 		AdminToken:    CreatePassword(8),
 		Secred:        CreatePassword(32),
+		BaseURL:       "http://localhost",
 	}
 }
 

@@ -106,33 +106,48 @@ func (s server) handleLogout(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
-	// u, _ := user.FromRequest(r, []byte(s.cfg.Secred))
-	// if bietID := r.URL.Query().Get("biet-id"); bietID != "" {
-	// 	id, _ := strconv.Atoi(bietID)
-	// 	u = user.FromID(id)
-	// }
+	if bietID := r.URL.Query().Get("biet-id"); bietID != "" {
+		m, done := s.model.ForReading()
+		defer done()
+		state := m.State
+		id, _ := strconv.Atoi(bietID)
+		u := user.FromID(id)
+		_, ok := m.Bieter[u.BieterID]
+		if u.IsAnonymous() || !ok {
+			return s.showLoginPage(r.Context(), w, state, "", "")
+		}
+
+		u.SetCookie(w, []byte(s.cfg.Secred))
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return nil
+	}
 
 	m, done := s.model.ForReading()
-	user, _ := user.FromRequest(r, []byte(s.cfg.Secred))
-
-	bieter, ok := m.Bieter[user.BieterID]
-	state := m.State
-	done()
-
-	if user.IsAnonymous() || !ok {
+	u, _ := user.FromRequest(r, []byte(s.cfg.Secred))
+	bieter, ok := m.Bieter[u.BieterID]
+	if u.IsAnonymous() || !ok {
+		done()
 		return s.handleLoginPage(w, r)
 	}
+
+	state := m.State
+	done()
 	return s.handleBieterDetail(w, r, state, bieter)
 }
 
 func (s server) handleLoginPage(w http.ResponseWriter, r *http.Request) error {
+	m, done := s.model.ForReading()
+	state := m.State
+	done()
+
 	switch r.Method {
 	case http.MethodGet:
-		return s.showLoginPage(r.Context(), w, "", "")
+
+		return s.showLoginPage(r.Context(), w, state, "", "")
 
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
-			return s.showLoginPage(r.Context(), w, "Formular kann nicht gelesen werden. Bitte versuche es erneut.", "Formular kann nicht gelesen werden. Bitte versuche es erneut.")
+			return s.showLoginPage(r.Context(), w, state, "Formular kann nicht gelesen werden. Bitte versuche es erneut.", "Formular kann nicht gelesen werden. Bitte versuche es erneut.")
 		}
 
 		switch r.Form.Get("form") {
@@ -143,7 +158,7 @@ func (s server) handleLoginPage(w http.ResponseWriter, r *http.Request) error {
 			return s.handleRegisterPost(w, r)
 
 		default:
-			return s.showLoginPage(r.Context(), w, "Formular kann nicht gelesen werden. Bitte versuche es erneut.", "Formular kann nicht gelesen werden. Bitte versuche es erneut.")
+			return s.showLoginPage(r.Context(), w, state, "Formular kann nicht gelesen werden. Bitte versuche es erneut.", "Formular kann nicht gelesen werden. Bitte versuche es erneut.")
 		}
 
 	default:
@@ -152,10 +167,8 @@ func (s server) handleLoginPage(w http.ResponseWriter, r *http.Request) error {
 	}
 }
 
-func (s server) showLoginPage(ctx context.Context, w http.ResponseWriter, loginFormError, registerFormError string) error {
-	m, done := s.model.ForReading()
-	defer done()
-	return template.LoginPage(m.State, "", loginFormError, registerFormError).Render(ctx, w)
+func (s server) showLoginPage(ctx context.Context, w http.ResponseWriter, state model.ServiceState, loginFormError, registerFormError string) error {
+	return template.LoginPage(state, "", loginFormError, registerFormError).Render(ctx, w)
 }
 
 func (s server) handleLoginPost(w http.ResponseWriter, r *http.Request) error {
@@ -309,7 +322,7 @@ func (s server) handleVertrag(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	vertrag, err := pdf.Bietervertrag("test", bieter)
+	vertrag, err := pdf.Bietervertrag(s.cfg.BaseURL, bieter)
 	if err != nil {
 		return err
 	}
