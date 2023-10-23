@@ -1,14 +1,12 @@
 # Zwingend
 
 * CSV-Export
-* Admin verschwindet in Mobile
 * Gemüsevertrag bei Jährlich
 * Gebot kann negativ sein.
 
 
 # Optional
 
-* Admin bieter detail
 * Error handling in htmx views
 * Bieten autoupdate
 * Post Redirect Get
@@ -20,6 +18,5 @@
 # Bugs
 * Loginform: type number oder abc verbieten
 * Fehlermeldung über button
-* Bieternummer keine führenden Nullen.
 * Lösch Bestätigung mit Modal.
 * Gelöschten auf bearbeiten klicken.

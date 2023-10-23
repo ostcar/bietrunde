@@ -40,7 +40,7 @@ func layout(name string, showLogout bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script></head><body><nav class=\"navbar\" role=\"navigation\"><div class=\"navbar-menu\"><div class=\"navbar-end\"><a href=\"/admin\" class=\"navbar-item\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script></head><body><nav class=\"navbar\" role=\"navigation\"><div class=\"navbar-brand\"><a href=\"/admin\" class=\"navbar-item\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -68,7 +68,7 @@ func layout(name string, showLogout bool) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></nav><main class=\"section column is-half-desktop\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></nav><main class=\"section column is-half-desktop\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

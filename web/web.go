@@ -106,12 +106,13 @@ func (s server) handleLogout(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
+	u, _ := user.FromRequest(r, []byte(s.cfg.Secred))
 	if bietID := r.URL.Query().Get("biet-id"); bietID != "" {
 		m, done := s.model.ForReading()
 		defer done()
 		state := m.State
 		id, _ := strconv.Atoi(bietID)
-		u := user.FromID(id)
+		u.BieterID = id
 		_, ok := m.Bieter[u.BieterID]
 		if u.IsAnonymous() || !ok {
 			return s.showLoginPage(r.Context(), w, state, "", "")
@@ -123,7 +124,7 @@ func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	m, done := s.model.ForReading()
-	u, _ := user.FromRequest(r, []byte(s.cfg.Secred))
+
 	bieter, ok := m.Bieter[u.BieterID]
 	if u.IsAnonymous() || !ok {
 		done()

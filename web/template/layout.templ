@@ -17,13 +17,11 @@ templ layout(name string, showLogout bool) {
 		</head>
 		<body>
 			<nav class="navbar" role="navigation">
-				<div class="navbar-menu">
-					<div class="navbar-end">
-						<a href="/admin" class="navbar-item">Admin</a>
-						if showLogout {
-							<a href="/logout" class="navbar-item">Logout</a>
-						}
-					</div>
+				<div class="navbar-brand">
+					<a href="/admin" class="navbar-item">Admin</a>
+					if showLogout {
+						<a href="/logout" class="navbar-item">Logout</a>
+					}
 				</div>
 			</nav>
 			<main class="section column is-half-desktop">

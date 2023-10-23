@@ -161,7 +161,7 @@ func New() Model {
 
 // BieterCreate creates a new bieter with empty data.
 func (m Model) BieterCreate() (int, Event) {
-	id := rand.Intn(100_000_000)
+	id := rand.Intn(899_999_999) + 100_000_000
 	return id, eventBieterCreate{ID: id}
 }
 

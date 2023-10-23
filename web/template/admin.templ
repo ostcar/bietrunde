@@ -1,6 +1,7 @@
 package template
 
 import (
+	"fmt"
 	"strconv"
 	"github.com/ostcar/bietrunde/model"
 )
@@ -112,7 +113,7 @@ templ AdminUserTable(bieter []model.Bieter) {
 							class="has-background-danger"
 						}
 					>
-						<th>{ strconv.Itoa(bieter.ID) }</th>
+						<th><a href={ templ.URL(fmt.Sprintf("/?biet-id=%d", bieter.ID)) }>{ strconv.Itoa(bieter.ID) }</a></th>
 						<th>{ bieter.Name() }</th>
 						<th>
 							if bieter.Gebot.Empty() {
