@@ -9,7 +9,9 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 	@layout("Bietrunde - " + bieter.Name(), true) {
 		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
-		@gebotShow(state,bieter.Gebot, err)
+		<div hx-ext="sse" sse-connect="/sse" sse-swap="message">
+			@GebotShow(state,bieter.Gebot, err)
+		</div>
 		<p class="block">
 			<strong>
 				if len(bieter.InvalidFields()) == 0 {
@@ -79,7 +81,7 @@ func classes(class ...string) string {
 	return joined[:len(joined)-1]
 }
 
-templ gebotShow(state model.ServiceState, gebot model.Gebot, err string) {
+templ GebotShow(state model.ServiceState, gebot model.Gebot, err string) {
 	if state == model.StateOffer || !gebot.Empty() {
 		<div class="box">
 			<p class="block"><strong>Dein Gebot:</strong> { gebot.String() }</p>
@@ -87,6 +89,8 @@ templ gebotShow(state model.ServiceState, gebot model.Gebot, err string) {
 				@gebotForm(gebot, err)
 			}
 		</div>
+	} else {
+		<div></div>
 	}
 }
 

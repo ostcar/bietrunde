@@ -87,6 +87,7 @@ func (s *server) registerHandlers() {
 	router.Handle("/", handleError(s.handleHome))
 	router.Handle("/edit", handleError(s.handleEdit))
 	router.Handle("/vertrag", handleError(s.handleVertrag))
+	router.Handle("/sse", handleError(s.handleSSE))
 
 	router.Handle("/admin", handleError(s.adminPage(s.handleAdmin)))
 	router.Handle("/admin/new", handleError(s.adminPage(s.handleAdminNew)))
@@ -337,6 +338,57 @@ func (s server) handleVertrag(w http.ResponseWriter, r *http.Request) error {
 	return err
 }
 
+func (s server) handleSSE(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Add("Content-Type", "text/event-stream")
+	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+	if err != nil {
+		return err
+	}
+
+	if user.IsAnonymous() {
+		http.Error(w, "Only for logged in", 403)
+		return nil
+	}
+
+	if ok := s.sendGebotShow(r.Context(), w, user.BieterID); !ok {
+		return nil
+	}
+
+	s.model.Listen(r.Context())(func(events []string) bool {
+		var hasStateEvent bool
+		for _, event := range events {
+			if event == "set-state" {
+				hasStateEvent = true
+				break
+			}
+		}
+		if !hasStateEvent {
+			return true
+		}
+
+		return s.sendGebotShow(r.Context(), w, user.BieterID)
+	})
+	return nil
+}
+
+func (s server) sendGebotShow(ctx context.Context, w http.ResponseWriter, bietID int) bool {
+	m, done := s.model.ForReading()
+	defer done()
+	state := m.State
+	bieter, ok := m.Bieter[bietID]
+	if !ok {
+		return false
+	}
+
+	w.Write([]byte("data: "))
+	if err := template.GebotShow(state, bieter.Gebot, "").Render(ctx, w); err != nil {
+		return false
+	}
+	w.Write([]byte("\n\n"))
+	w.(http.Flusher).Flush()
+	return true
+}
+
 func parseBieterEdit(r *http.Request, bieter model.Bieter) (model.Bieter, string) {
 	if err := r.ParseForm(); err != nil {
 		return bieter, "Formular kann nicht gelesen werden. Versuche es erneut"
@@ -395,6 +447,9 @@ func (s server) handleAdmin(w http.ResponseWriter, r *http.Request) error {
 	defer done()
 
 	bieter := adminBieterList(m)
+	if r.Header.Get("HX-Request") != "" {
+		return template.AdminUserTable(bieter).Render(r.Context(), w)
+	}
 	return template.Admin(m.State, bieter).Render(r.Context(), w)
 }
 
@@ -567,6 +622,14 @@ type responselogger struct {
 func (r *responselogger) WriteHeader(code int) {
 	r.code = code
 	r.ResponseWriter.WriteHeader(code)
+}
+
+func (r *responselogger) Flush() {
+	flusher, ok := r.ResponseWriter.(http.Flusher)
+	if !ok {
+		return
+	}
+	flusher.Flush()
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {

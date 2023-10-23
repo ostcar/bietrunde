@@ -96,7 +96,7 @@ templ AdminStateSelect(state model.ServiceState) {
 }
 
 templ AdminUserTable(bieter []model.Bieter) {
-	<div id="admin-user-table">
+	<div id="admin-user-table" hx-get="/admin" hx-trigger="every 2s">
 		<table class="table box">
 			<thead>
 				<tr>
