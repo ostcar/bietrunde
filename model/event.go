@@ -130,6 +130,10 @@ func (e eventGebot) Validate(model Model) error {
 		return fmt.Errorf("bieter does not exist")
 	}
 
+	if e.Gebot < 0 {
+		return fmt.Errorf("gebot muss größer 0 sein")
+	}
+
 	return nil
 }
 

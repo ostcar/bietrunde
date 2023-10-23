@@ -29,12 +29,10 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 
 	m := maroto.New(cfg)
 
-	abbuchung := "Monatlich"
-	abbuchungText := "Die Abbuchung erfolgt am ersten Werktag eines Monats von April 2024 bis März 2025"
+	abbuchungText := "Die Abbuchung erfolgt am ersten Werktag eines Monats von April 2024 bis März 2025."
 	abbuchungBetrag := bieter.Gebot.String()
 	if bieter.Jaehrlich {
-		abbuchung = "Jährlich"
-		abbuchungText = "Die Abbuchung erfolgt am 1. Werktag im April 2024"
+		abbuchungText = "Die Abbuchung erfolgt am 1. Werktag im April 2024."
 		abbuchungBetrag = (bieter.Gebot * 12).String()
 	}
 
@@ -68,31 +66,28 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 		// Vertragstext
 		text.NewRow(10, fmt.Sprintf(`
 			Ich, %s (E-Mail: %s ), bin Mitglied im des Vereins Solidarische Landwirtschaft Baarfood e.V. 
-			und möchte im Gemüsejahr 2024/25 (April 2024 – März 2025) einen Gemüseanteil beziehen.`,
+			und möchte im Gemüsejahr 2024/2025 (April 2024 – März 2025) einen Gemüseanteil beziehen.`,
 			bieter.Name(), bieter.Mail),
 		),
-		text.NewRow(10,
-			`Nach erfolgreicher Bieterrunde schließe ich mit dem Verein Solidarische Landwirtschaft 
-			Baarfood e.V. diesen Gemüsevertrag ab.`,
-		),
 		text.NewRow(40,
-			`Die Gemüsevertrag gilt von April 2024 bis März 2025 (=12 Monate). 
+			`Die Gemüsevertrag gilt im oben genannten Zeitraum, daher für 12 Monate. 
 			Ich kann mein Gemüse wöchentlich an einer vorher festgelegten Verteilstelle abholen. 
 			Ich respektiere die in den Verteilstellen genannten Anteilsmengen und Abholfristen. 
 			Ich habe keinen Anspruch auf eine bestimmte Menge und Qualität der Produkte. 
-			Sollte es mir vorübergehend nicht möglich sein, meinen Pflichten (Abholung) nach zu kommen, 
+			Sollte es mir vorübergehend nicht möglich sein, meinen Pflichten (Abholung) nachzukommen, 
 			so sorge ich selbst in diesem Zeitraum für einen Ersatz. Im Falle einer Urlaubsvertretung weise 
 			ich persönlich in die Abholmodalitäten ein. Ein finanzieller Ausgleich wird privat organisiert. 
 			Die endgültige Abgabe meines Anteils im laufenden Jahr ist nur möglich, wenn ein anderes 
-			Vereinsmitglied, das bisher keinen Ernteanteil bezieht, oder ein neues Mitglied, den 
+			Vereinsmitglied, das bisher keinen Ernteanteil bezieht oder ein neues Mitglied, den 
 			oben genannten monatlichen finanziellen Beitrag für die verbleibenden Monate übernimmt. 
 			Erst ab diesem Zeitpunkt erfolgt der Lastschrifteinzug von diesem neuen Mitglied.`,
 		),
 		text.NewRow(5,
 			fmt.Sprintf(`Ich hole meinen Anteil in der Verteilstelle in %s ab.`, bieter.Verteilstelle.String()),
 		),
+		text.NewRow(5, abbuchungText),
 		text.NewRow(5,
-			fmt.Sprintf(`Die Abbuchung meines Beitrages für den Ernteanteil erfolgt von April 2024 bis März 2025 %s.`, abbuchung),
+			`Ist eine Abbuchung nicht möglich, so geht die Rückbuchungsgebühr zu meinen Lasten.`,
 		),
 
 		// Datum Unterschrift
@@ -128,9 +123,6 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 			`Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum,
 			die Erstattung des belasteten Betrages verlangen. Es gelten dabei die
 			mit meinem Kreditinstitut vereinbarten Bedingungen.`,
-		),
-		text.NewRow(5,
-			`Ist eine Abbuchung nicht möglich, so geht die Rückbuchungsgebühr zu meinen Lasten.`,
 		),
 
 		text.NewRow(5, fmt.Sprintf(`Kontoinhaber: %s`, bieter.ShowKontoinhaber())),
