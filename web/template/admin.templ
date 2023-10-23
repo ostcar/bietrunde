@@ -107,10 +107,20 @@ templ AdminUserTable(bieter []model.Bieter) {
 			</thead>
 			<tbody>
 				for _, bieter := range bieter {
-					<tr>
+					<tr
+ 						if len(bieter.InvalidFields()) != 0 {
+							class="has-background-danger"
+						}
+					>
 						<th>{ strconv.Itoa(bieter.ID) }</th>
 						<th>{ bieter.Name() }</th>
-						<th>{ bieter.Gebot.String() }</th>
+						<th>
+							if bieter.Gebot.Empty() {
+								-
+							} else {
+								Ja
+							}
+						</th>
 						<th>
 							<button
  								class="button is-warning is-small"
@@ -141,9 +151,9 @@ templ AdminUserTable(bieter []model.Bieter) {
 	</div>
 }
 
-templ AdminBieterEdit(bieter model.Bieter, err string) {
+templ AdminBieterEdit(bieter model.Bieter, fieldErrors map[string]string) {
 	@adminModal(bieter.Name(), "/admin/edit/"+ strconv.Itoa(bieter.ID)) {
-		@bieterEditFormFields(bieter, err)
+		@bieterEditFormFields(bieter, fieldErrors)
 	}
 }
 

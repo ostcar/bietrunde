@@ -1,29 +1,25 @@
 # Zwingend
 
 * CSV-Export
-* User validieren und invalide User in admin page hervorheben.
+* Admin verschwindet in Mobile
+* Gemüsevertrag bei Jährlich
+* Gebot kann negativ sein.
 
 
 # Optional
 
 * Admin bieter detail
 * Error handling in htmx views
-* Validate bieter edit
 * Bieten autoupdate
-* Gebot auf Admin Seite verstecken!
 * Post Redirect Get
 * README auffrischen
 * Auto detect base url
+* Weiterer status Fertig -> Zeige bei Jährlich Betrag mal 12 an und fordere auf diesen Eintragen
 
 
 # Bugs
-
 * Loginform: type number oder abc verbieten
-* Gemüsevertrag bei Jährlich
-* Admin verschwindet in Mobile
 * Fehlermeldung über button
 * Bieternummer keine führenden Nullen.
-* Gebot kann negativ sein.
 * Lösch Bestätigung mit Modal.
 * Gelöschten auf bearbeiten klicken.
-* Weiterer status Fertig -> Zeige bei Jährlich Betrag mal 12 an und fordere auf diesen Eintragen

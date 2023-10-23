@@ -3,8 +3,11 @@ package model
 import (
 	"fmt"
 	"math/rand"
+	"net/mail"
 	"strconv"
 	"strings"
+
+	"github.com/jbub/banking/iban"
 )
 
 // Gebot is an offer.
@@ -89,10 +92,57 @@ func (b Bieter) ShowKontoinhaber() string {
 	return b.Name()
 }
 
-// Valid tells, if all the bieter data is correct.
-func (b Bieter) Valid() bool {
-	// TODO
-	return true
+// InvalidFields returns a map from invalid fields to an error message.
+func (b Bieter) InvalidFields() map[string]string {
+	invalid := make(map[string]string)
+	if b.Vorname == "" {
+		invalid["vorname"] = "Vorname darf nicht leer sein."
+	}
+
+	if b.Nachname == "" {
+		invalid["nachname"] = "Nachname darf nicht leer sein."
+	}
+
+	if _, err := mail.ParseAddress(b.Mail); err != nil {
+		if b.Mail == "" {
+			invalid["mail"] = "E-Mail Adresse muss angegeben sein."
+		} else {
+			invalid["mail"] = "Dies ist keine gültige E-Mail-Adresse"
+		}
+	}
+
+	if b.Adresse == "" {
+		invalid["adresse"] = "Adresse darf nicht leer sein."
+	}
+
+	if !b.Mitglied {
+		invalid["mitglied"] = "Du und der Teilnehmer müssen Mitglieder im Verein sein."
+	}
+
+	if b.Verteilstelle.ToAttr() == "-" {
+		invalid["verteilstelle"] = "Wähle eine Verteilstelle aus."
+	}
+
+	if _, err := iban.Parse(strings.ReplaceAll(b.IBAN, " ", "")); err != nil {
+		if b.IBAN == "" {
+			invalid["iban"] = "Gebe eine IBAN an."
+		} else {
+			invalid["iban"] = "IBAN ist nicht gültig. Bitte überprüfe sie."
+		}
+	}
+	return invalid
+}
+
+// FormatIBAN returns an ban with spaces.
+func FormatIBAN(iban string) string {
+	withoutSpace := strings.ReplaceAll(iban, " ", "")
+	var parts []string
+	for len(withoutSpace) > 0 {
+		sep := min(len(withoutSpace), 4)
+		parts = append(parts, withoutSpace[:sep])
+		withoutSpace = withoutSpace[sep:]
+	}
+	return strings.Join(parts, " ")
 }
 
 // Model of the service.
@@ -117,6 +167,7 @@ func (m Model) BieterCreate() (int, Event) {
 
 // BieterUpdate updates all fields of a bieter.
 func (m Model) BieterUpdate(bieter Bieter) Event {
+	bieter.IBAN = FormatIBAN(bieter.IBAN)
 	return eventBieterUpdate{bieter}
 }
 

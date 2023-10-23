@@ -5,14 +5,14 @@ import (
 	"github.com/ostcar/bietrunde/model"
 )
 
-templ Bieter(state model.ServiceState, bieter model.Bieter, err string) {
+templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidFields map[string]string) {
 	@layout("Bietrunde - " + bieter.Name(), true) {
 		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
 		@gebotShow(state,bieter.Gebot, err)
 		<p class="block">
 			<strong>
-				if bieter.Valid() {
+				if len(bieter.InvalidFields()) == 0 {
 					Bitte drucke vor der Bietrunde den <a href="/vertrag" target="_blank">Vertrag</a> aus und bringe ihn mit!
 				} else if state == model.StateRegistration {
 					Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
@@ -23,19 +23,19 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string) {
 		</p>
 		<dl class="block">
 			<dt class="has-text-weight-bold">E-Mail:</dt>
-			<dd class="ml-5">
+			<dd class={ classes("ml-5", errClass(invalidFields["mail"])) }>
 				@ddString( bieter.Mail)
 			</dd>
 			<dt class="has-text-weight-bold">Adresse:</dt>
-			<dd class="ml-5">
+			<dd class={ classes("ml-5", errClass(invalidFields["adresse"])) }>
 				@ddmultilineString(bieter.Adresse)
 			</dd>
 			<dt class="has-text-weight-bold">Mitglied:</dt>
-			<dd class="ml-5">
+			<dd class={ classes("ml-5", errClass(invalidFields["mitglied"])) }>
 				@jaNein(bieter.Mitglied)
 			</dd>
 			<dt class="has-text-weight-bold">Verteilstelle:</dt>
-			<dd class="ml-5">
+			<dd class={ classes("ml-5", errClass(invalidFields["verteilstelle"])) }>
 				@ddString(bieter.Verteilstelle.String())
 			</dd>
 			<dt class="has-text-weight-bold">Teilpartner:</dt>
@@ -43,7 +43,7 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string) {
 				@ddString( bieter.Teilpartner)
 			</dd>
 			<dt class="has-text-weight-bold">IBAN:</dt>
-			<dd class="ml-5">
+			<dd class={ classes("ml-5", errClass(invalidFields["iban"])) }>
 				@ddString( bieter.IBAN)
 			</dd>
 			<dt class="has-text-weight-bold">Kontoinhaber:</dt>
@@ -59,6 +59,24 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string) {
 			<a href="/edit" class="block button is-primary">Bearbeiten</a>
 		}
 	}
+}
+
+func errClass(s string) string {
+	if s == "" {
+		return ""
+	}
+	return "has-text-danger"
+}
+
+func classes(class ...string) string {
+	var joined string
+	for _, c := range class {
+		if c == "" {
+			continue
+		}
+		joined += c + " "
+	}
+	return joined[:len(joined)-1]
 }
 
 templ gebotShow(state model.ServiceState, gebot model.Gebot, err string) {

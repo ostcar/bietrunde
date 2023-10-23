@@ -211,34 +211,35 @@ func (s server) handleRegisterPost(w http.ResponseWriter, r *http.Request) error
 }
 
 func (s server) handleBieterDetail(w http.ResponseWriter, r *http.Request, state model.ServiceState, bieter model.Bieter) error {
+	invalidFields := bieter.InvalidFields()
 	switch r.Method {
 	case http.MethodGet:
-		return template.Bieter(state, bieter, "").Render(r.Context(), w)
+		return template.Bieter(state, bieter, "", invalidFields).Render(r.Context(), w)
 
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
-			return template.Bieter(state, bieter, "Formular kann nicht gelesen werden. Bitte versuche es erneut.").Render(r.Context(), w)
+			return template.Bieter(state, bieter, "Formular kann nicht gelesen werden. Bitte versuche es erneut.", invalidFields).Render(r.Context(), w)
 		}
 
 		if r.Form.Get("form") != "gebot" {
-			return template.Bieter(state, bieter, "").Render(r.Context(), w)
+			return template.Bieter(state, bieter, "", invalidFields).Render(r.Context(), w)
 		}
 
 		gebot, err := model.GebotFromString(r.Form.Get("gebot"))
 		if err != nil {
-			return template.Bieter(state, bieter, "Dein Gebot muss eine Zahl sein.").Render(r.Context(), w)
+			return template.Bieter(state, bieter, "Dein Gebot muss eine Zahl sein.", invalidFields).Render(r.Context(), w)
 		}
 
 		m, write, done := s.model.ForWriting()
 		defer done()
 
 		if err := write(m.SetGebot(bieter.ID, gebot)); err != nil {
-			return template.Bieter(state, bieter, userError(err)).Render(r.Context(), w)
+			return template.Bieter(state, bieter, userError(err), invalidFields).Render(r.Context(), w)
 		}
 
 		bieter = m.Bieter[bieter.ID]
 
-		return template.Bieter(state, bieter, "").Render(r.Context(), w)
+		return template.Bieter(state, bieter, "", invalidFields).Render(r.Context(), w)
 
 	default:
 		http.Error(w, "Fehler", http.StatusMethodNotAllowed)
@@ -270,7 +271,7 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 			return template.LoginPage(m.State, "", "", "").Render(r.Context(), w)
 		}
 
-		return template.BieterEdit(bieter, "").Render(r.Context(), w)
+		return template.BieterEdit(bieter, bieter.InvalidFields()).Render(r.Context(), w)
 
 	case http.MethodPost:
 		m, write, done := s.model.ForWriting()
@@ -289,11 +290,15 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 
 		bieter, errMsg := parseBieterEdit(r, bieter)
 		if errMsg != "" {
-			return template.BieterEdit(bieter, "Formular kann nicht gelesen werden. Versuche es erneut").Render(r.Context(), w)
+			invalidFields := bieter.InvalidFields()
+			invalidFields["form"] = "Formular kann nicht gelesen werden. Versuche es erneut"
+			return template.BieterEdit(bieter, invalidFields).Render(r.Context(), w)
 		}
 
 		if err := write(m.BieterUpdate(bieter)); err != nil {
-			return template.BieterEdit(bieter, userError(err)).Render(r.Context(), w)
+			invalidFields := bieter.InvalidFields()
+			invalidFields["form"] = userError(err)
+			return template.BieterEdit(bieter, invalidFields).Render(r.Context(), w)
 		}
 
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -427,10 +432,8 @@ func (s server) handleAdminNew(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	bieter := m.Bieter[bieterID]
-	_ = bieter
-
 	template.AdminUserTable(adminBieterList(m)).Render(r.Context(), w)
-	template.AdminBieterEdit(bieter, "").Render(r.Context(), w)
+	template.AdminBieterEdit(bieter, bieter.InvalidFields()).Render(r.Context(), w)
 
 	return nil
 }
@@ -449,7 +452,7 @@ func (s server) handleAdminEdit(w http.ResponseWriter, r *http.Request) error {
 			return nil
 		}
 
-		return template.AdminBieterEdit(bieter, "").Render(r.Context(), w)
+		return template.AdminBieterEdit(bieter, bieter.InvalidFields()).Render(r.Context(), w)
 	case http.MethodPost:
 		m, write, done := s.model.ForWriting()
 		defer done()
@@ -463,7 +466,7 @@ func (s server) handleAdminEdit(w http.ResponseWriter, r *http.Request) error {
 		if errMsg != "" {
 			// TODO: fehlermeldung senden
 			return nil
-			return template.BieterEdit(bieter, "Formular kann nicht gelesen werden. Versuche es erneut").Render(r.Context(), w)
+			// return template.BieterEdit(bieter, "Formular kann nicht gelesen werden. Versuche es erneut").Render(r.Context(), w)
 		}
 
 		if err := write(m.BieterUpdate(bieter)); err != nil {

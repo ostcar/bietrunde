@@ -6,6 +6,7 @@ require (
 	github.com/a-h/templ v0.2.408
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/gorilla/mux v1.8.0
+	github.com/jbub/banking v0.8.0
 	github.com/johnfercher/maroto/v2 v2.0.0-alpha.41
 	github.com/ostcar/sticky v0.0.0-20231020174652-ff503f2202a3
 	github.com/pelletier/go-toml/v2 v2.1.0

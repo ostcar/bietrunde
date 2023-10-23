@@ -4,11 +4,14 @@ import (
 	"github.com/ostcar/bietrunde/model"
 )
 
-templ BieterEdit(bieter model.Bieter, err string) {
+templ BieterEdit(bieter model.Bieter, fieldErrors map[string]string) {
 	@layout("Bietrunde - " + bieter.Name(), true) {
 		<div class="columns">
 			<form action="/edit" method="post">
-				@bieterEditFormFields(bieter, err)
+				@bieterEditFormFields(bieter, fieldErrors)
+				if fieldErrors["form"] != "" {
+					<p class="help is-danger">{ fieldErrors["form"] } </p>
+				}
 				<div class="field is-grouped">
 					<div class="control">
 						<button class="button is-primary" type="submit">Speichern</button>
@@ -22,55 +25,64 @@ templ BieterEdit(bieter model.Bieter, err string) {
 	}
 }
 
-templ bieterEditFormFields(bieter model.Bieter, err string) {
-	if err != "" {
-		<p class="help is-danger">{ err }</p>
-	}
-	@formFieldName(bieter.Vorname, bieter.Nachname)
-	@formFieldMail(bieter.Mail)
-	@formFieldAdresse(bieter.Adresse)
-	@formFieldVerteilstelle(bieter.Verteilstelle)
+templ bieterEditFormFields(bieter model.Bieter, fieldErrors map[string]string) {
+	@formFieldName(bieter.Vorname, bieter.Nachname, fieldErrors["vorname"], fieldErrors["nachname"])
+	@formFieldMail(bieter.Mail, fieldErrors["mail"])
+	@formFieldAdresse(bieter.Adresse, fieldErrors["adresse"])
+	@formFieldVerteilstelle(bieter.Verteilstelle, fieldErrors["verteilstelle"])
 	@formFieldTeilpartner(bieter.Teilpartner)
-	@formFieldMitglied(bieter.Mitglied)
-	@formFieldIBAN(bieter.IBAN)
+	@formFieldMitglied(bieter.Mitglied, fieldErrors["mitglied"])
+	@formFieldIBAN(bieter.IBAN, fieldErrors["iban"])
 	@formFieldKontoinhaber(bieter.Kontoinhaber)
 	@formAbbuchung(bieter.Jaehrlich)
 }
 
-templ formFieldName(vorname, nachname string) {
+templ formFieldName(vorname, nachname, errVorname, errNachname string) {
 	<div class="field">
 		<div class="field-body">
 			<div class="field">
 				<label class="label">Vorname</label>
 				<input name="vorname" class="input" type="text" placeholder="Vorname" value={ vorname }/>
+				if errVorname != "" {
+					<p class="help is-danger">{ errVorname }</p>
+				}
 			</div>
 			<div class="field">
 				<label class="label">Nachname</label>
 				<input name="nachname" class="input" type="text" placeholder="Nachname" value={ nachname }/>
+				if errNachname != "" {
+					<p class="help is-danger">{ errNachname }</p>
+				}
 			</div>
 		</div>
 	</div>
 }
 
-templ formFieldMail(mail string) {
+templ formFieldMail(mail string, err string) {
 	<div class="field">
 		<label class="label">E-Mail</label>
 		<div class="control">
 			<input name="mail" class="input" type="text" placeholder="E-Mail" value={ mail }/>
 		</div>
+		if err != "" {
+			<p class="help is-danger">{ err }</p>
+		}
 	</div>
 }
 
-templ formFieldAdresse(adresse string) {
+templ formFieldAdresse(adresse string, err string) {
 	<div class="field">
 		<label class="label">Adresse</label>
 		<div class="control">
 			<textarea name="adresse" class="textarea" placeholder="Musterstraße 13\n12345 Musterstadt">{ adresse }</textarea>
 		</div>
+		if err != "" {
+			<p class="help is-danger">{ err }</p>
+		}
 	</div>
 }
 
-templ formFieldMitglied(mitglied bool) {
+templ formFieldMitglied(mitglied bool, err string) {
 	<div class="field">
 		<label class="label">Mitglied</label>
 		<div class="control">
@@ -79,10 +91,13 @@ templ formFieldMitglied(mitglied bool) {
 				Bieter <strong>und</strong> Teilpartner sind Mitglied.
 			</label>
 		</div>
+		if err != "" {
+			<p class="help is-danger">{ err }</p>
+		}
 	</div>
 }
 
-templ formFieldVerteilstelle(v model.Verteilstelle) {
+templ formFieldVerteilstelle(v model.Verteilstelle, err string) {
 	<div class="field">
 		<label class="label">Verteilstelle</label>
 		<div class="control">
@@ -95,6 +110,9 @@ templ formFieldVerteilstelle(v model.Verteilstelle) {
 				</select>
 			</div>
 		</div>
+		if err != "" {
+			<p class="help is-danger">{ err }</p>
+		}
 	</div>
 }
 
@@ -108,12 +126,15 @@ templ formFieldTeilpartner(partner string) {
 	</div>
 }
 
-templ formFieldIBAN(iban string) {
+templ formFieldIBAN(iban string, err string) {
 	<div class="field">
 		<label class="label">IBAN</label>
 		<div class="control">
 			<input name="iban" class="input" type="text" placeholder="DE12 3456" value={ iban }/>
 		</div>
+		if err != "" {
+			<p class="help is-danger">{ err }</p>
+		}
 	</div>
 }
 
