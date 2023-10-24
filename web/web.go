@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"context"
 	"embed"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -95,6 +96,7 @@ func (s *server) registerHandlers() {
 	router.Handle("/admin/delete/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminDelete)))
 	router.Handle("/admin/state", handleError(s.adminPage(s.handleAdminState)))
 	router.Handle("/admin/reset-gebot", handleError(s.adminPage(s.handleAdminResetGebot)))
+	router.Handle("/admin/csv", handleError(s.adminPage(s.handleAdminCSV)))
 
 	s.Handler = loggingMiddleware(router)
 }
@@ -594,6 +596,25 @@ func (s server) handleAdminState(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return template.AdminStateSelect(state).Render(r.Context(), w)
+}
+
+func (s server) handleAdminCSV(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Add("Content-Type", "text/csv")
+	w.Header().Add("Content-Disposition", `attachment; filename="bieter.csv`)
+	m, done := s.model.ForReading()
+	defer done()
+
+	csvW := csv.NewWriter(w)
+	if err := csvW.Write(model.BieterCSVHeader()); err != nil {
+		return err
+	}
+	for _, bieter := range m.Bieter {
+		if err := csvW.Write(bieter.CSVRecord()); err != nil {
+			return err
+		}
+	}
+	csvW.Flush()
+	return nil
 }
 
 func handleStatic() http.Handler {

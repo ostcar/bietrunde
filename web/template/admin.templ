@@ -77,6 +77,12 @@ templ Admin(state model.ServiceState, bieter []model.Bieter) {
 			>
 				Neue Bietrunde
 			</div>
+			<a
+ 				class="button is-warning"
+ 				href="/admin/csv"
+			>
+				CSV Export
+			</a>
 		</div>
 		@AdminModalEmpty()
 	}

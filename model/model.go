@@ -133,8 +133,56 @@ func (b Bieter) InvalidFields() map[string]string {
 	return invalid
 }
 
-// FormatIBAN returns an ban with spaces.
-func FormatIBAN(iban string) string {
+// BieterCSVHeader returns the header coresponding to Bieter.CSVRecord().
+func BieterCSVHeader() []string {
+	return []string{
+		"id",
+		"vorname",
+		"nachname",
+		"mail",
+		"adresse",
+		"mitglied",
+		"verteilstelle",
+		"teilpartner",
+		"iban",
+		"kontoinhaber",
+		"abbuchung",
+		"gebot-monat",
+	}
+}
+
+// CSVRecord returns the bieter as csv record
+func (b Bieter) CSVRecord() []string {
+	mitglied := "Nein"
+	if b.Mitglied {
+		mitglied = "Ja"
+	}
+	abbuchung := "monatlich"
+	if b.Jaehrlich {
+		abbuchung = "jährlich"
+	}
+	gebot := b.Gebot.String()
+	if gebot == "-" {
+		gebot = ""
+	}
+
+	return []string{
+		strconv.Itoa(b.ID),
+		b.Vorname,
+		b.Nachname,
+		b.Mail,
+		b.Adresse,
+		mitglied,
+		b.Verteilstelle.String(),
+		b.Teilpartner,
+		b.IBAN,
+		b.ShowKontoinhaber(),
+		abbuchung,
+		b.Gebot.String(),
+	}
+}
+
+func formatIBAN(iban string) string {
 	withoutSpace := strings.ReplaceAll(iban, " ", "")
 	var parts []string
 	for len(withoutSpace) > 0 {
@@ -167,7 +215,7 @@ func (m Model) BieterCreate() (int, Event) {
 
 // BieterUpdate updates all fields of a bieter.
 func (m Model) BieterUpdate(bieter Bieter) Event {
-	bieter.IBAN = FormatIBAN(bieter.IBAN)
+	bieter.IBAN = formatIBAN(bieter.IBAN)
 	return eventBieterUpdate{bieter}
 }
 
