@@ -10,19 +10,8 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
 		<div hx-ext="sse" sse-connect="/sse" sse-swap="message">
-			@GebotShow(state,bieter.Jaehrlich, bieter.Gebot, err)
+			@GebotShow(state,bieter, err)
 		</div>
-		<p class="block">
-			<strong>
-				if len(bieter.InvalidFields()) == 0 {
-					Bitte drucke vor der Bietrunde den <a href="/vertrag" target="_blank">Vertrag</a> aus und bringe ihn mit!
-				} else if state == model.StateRegistration {
-					Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
-				} else {
-					Deine Daten sind nicht valide. Bitte setze dich mit dem Vorstand in Verbindung.
-				}
-			</strong>
-		</p>
 		<dl class="block">
 			<dt class="has-text-weight-bold">E-Mail:</dt>
 			<dd class={ classes("ml-5", errClass(invalidFields["mail"])) }>
@@ -81,31 +70,50 @@ func classes(class ...string) string {
 	return joined[:len(joined)-1]
 }
 
-templ GebotShow(state model.ServiceState, jaehrlich bool, gebot model.Gebot, err string) {
-	if state == model.StateOffer || state == model.StateFinish {
-		<div class="box">
-			<div class="block">
-				<p><strong>Dein Gebot:</strong> { gebot.String() }</p>
-				if state == model.StateFinish {
-					if jaehrlich {
-						<p>Bitte trage dein Jahresgebot von <strong>{ (gebot * 12).String() }</strong> in das Formular ein.</p>
-					} else {
-						<p>Bitte trage dein Gebot in das Formular ein.</p>
-					}
+templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
+	switch state {
+		case model.StateRegistration:
+			<div class="box">
+				if len(bieter.InvalidFields()) == 0 {
+					Bitte drucke vor der Bietrunde den <a href="/vertrag" target="_blank">Vertrag</a> aus und bringe ihn mit!
+				} else {
+					Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
 				}
 			</div>
-			if state == model.StateOffer {
-				@gebotForm(gebot, err)
-			}
-		</div>
-	} else {
-		<div></div>
+		case model.StateValidation:
+			<div class="box">
+				if len(bieter.InvalidFields()) == 0 {
+					Bitte drucke vor der Bietrunde den <a href="/vertrag" target="_blank">Vertrag</a> aus und bringe ihn mit!
+				} else {
+					Deine Daten sind nicht valide. Bitte setze dich mit dem Vorstand in Verbindung.
+				}
+			</div>
+		case model.StateOffer:
+			<div class="box">
+				<p><strong>Dein monatliches Gebot:</strong> { bieter.Gebot.String() }</p>
+				if state == model.StateOffer {
+					@gebotForm(bieter.Gebot, err)
+				}
+			</div>
+		case model.StateFinish:
+			<div class="box">
+				<p>
+					Die Bietrunde ist abgeschlossen.
+					if bieter.Gebot != 0 {
+						if bieter.Jaehrlich {
+							Bitte trage dein Jahresgebot von <strong>{ (bieter.Gebot * 12).String() }</strong>
+						} else {
+							Bitte trage dein monatliches Gebot von <strong>{ bieter.Gebot.String() }</strong>
+						}
+						in den <a href="/vertrag" target="_blank">Vertrag</a> ein.
+					}
+				</p>
+			</div>
 	}
 }
 
 templ gebotForm(gebot model.Gebot, err string) {
 	<div class="block">
-		<p>Bitte gebe dein Gebot ab</p>
 		<form action="/" method="post">
 			<input type="hidden" name="form" value="gebot"/>
 			<div class="field is-grouped">

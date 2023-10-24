@@ -342,17 +342,19 @@ func (s server) handleVertrag(w http.ResponseWriter, r *http.Request) error {
 
 func (s server) handleSSE(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Add("Content-Type", "text/event-stream")
-	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+	w.Header().Add("Content-Disposition", "inline")
+
+	u, err := user.FromRequest(r, []byte(s.cfg.Secred))
 	if err != nil {
 		return err
 	}
 
-	if user.IsAnonymous() {
+	if u.IsAnonymous() {
 		http.Error(w, "Only for logged in", 403)
 		return nil
 	}
 
-	if ok := s.sendGebotShow(r.Context(), w, user.BieterID); !ok {
+	if ok := s.sendGebotShow(r.Context(), w, u.BieterID); !ok {
 		return nil
 	}
 
@@ -368,7 +370,7 @@ func (s server) handleSSE(w http.ResponseWriter, r *http.Request) error {
 			return true
 		}
 
-		return s.sendGebotShow(r.Context(), w, user.BieterID)
+		return s.sendGebotShow(r.Context(), w, u.BieterID)
 	})
 	return nil
 }
@@ -379,11 +381,13 @@ func (s server) sendGebotShow(ctx context.Context, w http.ResponseWriter, bietID
 	state := m.State
 	bieter, ok := m.Bieter[bietID]
 	if !ok {
+		log.Println("no bieter")
 		return false
 	}
 
 	w.Write([]byte("data: "))
-	if err := template.GebotShow(state, bieter.Jaehrlich, bieter.Gebot, "").Render(ctx, w); err != nil {
+	if err := template.GebotShow(state, bieter, "").Render(ctx, w); err != nil {
+		log.Println("templ error")
 		return false
 	}
 	w.Write([]byte("\n\n"))
