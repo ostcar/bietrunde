@@ -10,7 +10,7 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
 		<div hx-ext="sse" sse-connect="/sse" sse-swap="message">
-			@GebotShow(state,bieter.Gebot, err)
+			@GebotShow(state,bieter.Jaehrlich, bieter.Gebot, err)
 		</div>
 		<p class="block">
 			<strong>
@@ -81,10 +81,19 @@ func classes(class ...string) string {
 	return joined[:len(joined)-1]
 }
 
-templ GebotShow(state model.ServiceState, gebot model.Gebot, err string) {
-	if state == model.StateOffer || !gebot.Empty() {
+templ GebotShow(state model.ServiceState, jaehrlich bool, gebot model.Gebot, err string) {
+	if state == model.StateOffer || state == model.StateFinish {
 		<div class="box">
-			<p class="block"><strong>Dein Gebot:</strong> { gebot.String() }</p>
+			<div class="block">
+				<p><strong>Dein Gebot:</strong> { gebot.String() }</p>
+				if state == model.StateFinish {
+					if jaehrlich {
+						<p>Bitte trage dein Jahresgebot von <strong>{ (gebot * 12).String() }</strong> in das Formular ein.</p>
+					} else {
+						<p>Bitte trage dein Gebot in das Formular ein.</p>
+					}
+				}
+			</div>
 			if state == model.StateOffer {
 				@gebotForm(gebot, err)
 			}

@@ -62,10 +62,31 @@ const (
 	StateRegistration
 	StateValidation
 	StateOffer
+	StateFinish
 )
 
+// States returns all possible states
+func States() []ServiceState {
+	return []ServiceState{
+		StateRegistration,
+		StateValidation,
+		StateOffer,
+		StateFinish,
+	}
+}
+
 func (s ServiceState) String() string {
-	return [...]string{"0 - Ungültig", "1 - Registrierung", "2 - Überprüfung", "3 - Gebote"}[s]
+	all := [...]string{
+		"Ungültig",
+		"Registrierung",
+		"Überprüfung",
+		"Gebote",
+		"Fertig",
+	}
+	if int(s) >= len(all) {
+		s = 0
+	}
+	return all[s]
 }
 
 // ToAttr converts to a attribute for select elements
@@ -77,6 +98,8 @@ func (s ServiceState) ToAttr() string {
 		return "validation"
 	case StateOffer:
 		return "offer"
+	case StateFinish:
+		return "finish"
 	default:
 		return "-"
 	}
@@ -92,6 +115,8 @@ func StateFromAttr(attr string) ServiceState {
 		return StateValidation
 	case "offer":
 		return StateOffer
+	case "finish":
+		return StateFinish
 	default:
 		return StateInvalid
 	}

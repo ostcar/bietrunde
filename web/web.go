@@ -383,7 +383,7 @@ func (s server) sendGebotShow(ctx context.Context, w http.ResponseWriter, bietID
 	}
 
 	w.Write([]byte("data: "))
-	if err := template.GebotShow(state, bieter.Gebot, "").Render(ctx, w); err != nil {
+	if err := template.GebotShow(state, bieter.Jaehrlich, bieter.Gebot, "").Render(ctx, w); err != nil {
 		return false
 	}
 	w.Write([]byte("\n\n"))

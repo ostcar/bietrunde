@@ -19,7 +19,8 @@ func (g Gebot) String() string {
 	}
 	euro := int(g) / 100
 	cent := int(g) % 100
-	return fmt.Sprintf("%d,%02d €", euro, cent)
+	euroStr := strReverse(strings.Join(strInGroup(strReverse(strconv.Itoa(euro)), 3), "."))
+	return fmt.Sprintf("%s,%02d €", euroStr, cent)
 }
 
 // NumberString returns a number for the form field.
@@ -182,14 +183,27 @@ func (b Bieter) CSVRecord() []string {
 	}
 }
 
+func strInGroup(str string, size int) []string {
+	var parts []string
+	for len(str) > 0 {
+		sep := min(len(str), size)
+		parts = append(parts, str[:sep])
+		str = str[sep:]
+	}
+	return parts
+}
+
+func strReverse(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
+}
+
 func formatIBAN(iban string) string {
 	withoutSpace := strings.ReplaceAll(iban, " ", "")
-	var parts []string
-	for len(withoutSpace) > 0 {
-		sep := min(len(withoutSpace), 4)
-		parts = append(parts, withoutSpace[:sep])
-		withoutSpace = withoutSpace[sep:]
-	}
+	parts := strInGroup(withoutSpace, 4)
 	return strings.Join(parts, " ")
 }
 

@@ -69,7 +69,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 			und möchte im Gemüsejahr 2024/2025 (April 2024 – März 2025) einen Gemüseanteil beziehen.`,
 			bieter.Name(), bieter.Mail),
 		),
-		text.NewRow(40,
+		text.NewRow(35,
 			`Die Gemüsevertrag gilt im oben genannten Zeitraum, daher für 12 Monate. 
 			Ich kann mein Gemüse wöchentlich an einer vorher festgelegten Verteilstelle abholen. 
 			Ich respektiere die in den Verteilstellen genannten Anteilsmengen und Abholfristen. 
@@ -101,6 +101,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 				text.New("Unterschrift", props.Text{Top: 15}),
 			),
 		),
+		row.New(20),
 
 		// Sepa
 		text.NewRow(15, "SEPA Lastschriftmandat", props.Text{
@@ -111,7 +112,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 		}),
 		text.NewRow(5, `Gläubiger-Identifikationsnummer: DE62ZZZ00001997635`),
 		text.NewRow(5, fmt.Sprintf(`Mandatsreferenz: 24%d`, bieter.ID)),
-		text.NewRow(10, abbuchungText),
+		text.NewRow(5, abbuchungText),
 		text.NewRow(5, fmt.Sprintf("Der Betrag lautet: %s", abbuchungBetrag), props.Text{Style: fontstyle.Bold}),
 		text.NewRow(15,
 			`Ich ermächtige den Verein Solidarische Landwirtschaft Baarfood e.V. 

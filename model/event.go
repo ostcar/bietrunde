@@ -104,7 +104,7 @@ func (e eventStateSet) Name() string {
 }
 
 func (e eventStateSet) Validate(model Model) error {
-	if int(e.State) <= 0 || int(e.State) > 3 {
+	if int(e.State) <= 0 || int(e.State) > len(States()) {
 		return fmt.Errorf("invalid state")
 	}
 

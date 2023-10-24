@@ -88,16 +88,16 @@ templ Admin(state model.ServiceState, bieter []model.Bieter) {
 	}
 }
 
-templ AdminStateSelect(state model.ServiceState) {
+templ AdminStateSelect(stateCur model.ServiceState) {
 	<select
  		name="state"
  		class="button is-info"
  		hx-post="/admin/state"
  		hx-swap="outerHTML"
 	>
-		<option selected?={ state == model.StateRegistration } value={ model.StateRegistration.ToAttr() }>Registrierung</option>
-		<option selected?={ state == model.StateValidation } value={ model.StateValidation.ToAttr() }>Überprüfung</option>
-		<option selected?={ state == model.StateOffer } value={ model.StateOffer.ToAttr() }>Bieten</option>
+		for _, state := range model.States() {
+			<option selected?={ stateCur == state } value={ state.ToAttr() }>{ state.String() }</option>
+		}
 	</select>
 }
 
