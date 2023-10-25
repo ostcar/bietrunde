@@ -4,7 +4,6 @@
 # Optional
 
 * Error handling in htmx views
-* Post Redirect Get
 * Auto detect base url
 * Fehlermeldung über button
 

@@ -102,9 +102,8 @@ func (s *server) registerHandlers() {
 }
 
 func (s server) handleLogout(w http.ResponseWriter, r *http.Request) error {
-	// TODO: Should this be only POST?
 	user.Logout(w)
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return nil
 }
 
@@ -122,7 +121,7 @@ func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
 		}
 
 		u.SetCookie(w, []byte(s.cfg.Secred))
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
 	}
 
@@ -177,41 +176,39 @@ func (s server) showLoginPage(ctx context.Context, w http.ResponseWriter, state 
 
 func (s server) handleLoginPost(w http.ResponseWriter, r *http.Request) error {
 	m, done := s.model.ForReading()
+	defer done()
+
 	bieterID, _ := strconv.Atoi(r.Form.Get("bietnumber"))
-	bieter, ok := m.Bieter[bieterID]
+	_, ok := m.Bieter[bieterID]
 	state := m.State
-	done()
 	if !ok {
 		return template.LoginPage(state, strconv.Itoa(bieterID), "Bietnummer nicht bekannt. ", "").Render(r.Context(), w)
 	}
 
 	user := user.FromID(bieterID)
 	user.SetCookie(w, []byte(s.cfg.Secred))
-	return s.handleBieterDetail(w, r, state, bieter)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	return nil
 }
 
 func (s server) handleRegisterPost(w http.ResponseWriter, r *http.Request) error {
 	m, write, done := s.model.ForWriting()
+	defer done()
 
 	state := m.State
 	if state != model.StateRegistration {
-		done()
 		return template.LoginPage(m.State, "", "", "Registrierung nicht möglich").Render(r.Context(), w)
 	}
 
 	bieterID, event := m.BieterCreate()
 	if err := write(event); err != nil {
-		done()
 		return template.LoginPage(m.State, "", "", userError(err)).Render(r.Context(), w)
 	}
 
-	bieter := m.Bieter[bieterID]
-
-	done()
-
 	user := user.FromID(bieterID)
 	user.SetCookie(w, []byte(s.cfg.Secred))
-	return s.handleBieterDetail(w, r, state, bieter)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	return nil
 }
 
 func (s server) handleBieterDetail(w http.ResponseWriter, r *http.Request, state model.ServiceState, bieter model.Bieter) error {
@@ -241,9 +238,8 @@ func (s server) handleBieterDetail(w http.ResponseWriter, r *http.Request, state
 			return template.Bieter(state, bieter, userError(err), invalidFields).Render(r.Context(), w)
 		}
 
-		bieter = m.Bieter[bieter.ID]
-
-		return template.Bieter(state, bieter, "", invalidFields).Render(r.Context(), w)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return nil
 
 	default:
 		http.Error(w, "Fehler", http.StatusMethodNotAllowed)
@@ -255,7 +251,7 @@ func (s server) handleBieterDetail(w http.ResponseWriter, r *http.Request, state
 func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
 	if err != nil || user.BieterID == 0 {
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
 	}
 
@@ -265,7 +261,7 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 		defer done()
 
 		if m.State != model.StateRegistration {
-			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return nil
 		}
 
@@ -282,20 +278,20 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 		defer done()
 
 		if m.State != model.StateRegistration {
-			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return nil
 		}
 
 		bieter, ok := m.Bieter[user.BieterID]
 		if !ok {
-			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return nil
 		}
 
 		bieter, errMsg := parseBieterEdit(r, bieter)
 		if errMsg != "" {
 			invalidFields := bieter.InvalidFields()
-			invalidFields["form"] = "Formular kann nicht gelesen werden. Versuche es erneut"
+			invalidFields["form"] = errMsg
 			return template.BieterEdit(bieter, invalidFields).Render(r.Context(), w)
 		}
 
@@ -305,7 +301,7 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 			return template.BieterEdit(bieter, invalidFields).Render(r.Context(), w)
 		}
 
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
 
 	default:
@@ -317,7 +313,7 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 func (s server) handleVertrag(w http.ResponseWriter, r *http.Request) error {
 	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
 	if err != nil || user.BieterID == 0 {
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
 	}
 
@@ -327,7 +323,7 @@ func (s server) handleVertrag(w http.ResponseWriter, r *http.Request) error {
 	bieter, ok := m.Bieter[user.BieterID]
 
 	if user.IsAnonymous() || !ok {
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
 	}
 
@@ -381,13 +377,11 @@ func (s server) sendGebotShow(ctx context.Context, w http.ResponseWriter, bietID
 	state := m.State
 	bieter, ok := m.Bieter[bietID]
 	if !ok {
-		log.Println("no bieter")
 		return false
 	}
 
 	w.Write([]byte("data: "))
 	if err := template.GebotShow(state, bieter, "").Render(ctx, w); err != nil {
-		log.Println("templ error")
 		return false
 	}
 	w.Write([]byte("\n\n"))
@@ -439,7 +433,9 @@ func (s server) adminPage(next func(w http.ResponseWriter, r *http.Request) erro
 			user.IsAdmin = true
 			user.SetCookie(w, []byte(s.cfg.Secred))
 
-			return next(w, r)
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
+
+			return nil
 
 		default:
 			http.Error(w, "Fehler", http.StatusMethodNotAllowed)
