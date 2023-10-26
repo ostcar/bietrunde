@@ -67,6 +67,7 @@ func (u User) SetCookie(w http.ResponseWriter, secred []byte) error {
 		MaxAge:   int(loginTime.Seconds()),
 		Secure:   true,
 		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	return nil
