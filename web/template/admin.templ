@@ -164,6 +164,30 @@ templ AdminBieterEdit(bieter model.Bieter, fieldErrors map[string]string) {
 	}
 }
 
+templ AdminError(msg string) {
+	<div id="admin-modal" hx-swap-oob="true" class="modal is-active">
+		<div class="modal-background"></div>
+		<div class="modal-card">
+			<header class="modal-card-head">
+				<p class="modal-card-title">Fehler</p>
+				<button class="delete" aria-label="close" onClick={ closeAdminModal() }></button>
+			</header>
+			<section class="modal-card-body">
+				<p>{ msg }</p>
+			</section>
+			<footer class="modal-card-foot">
+				<button
+ 					class="button"
+ 					type="button"
+ 					onClick={ closeAdminModal() }
+				>
+					Ok
+				</button>
+			</footer>
+		</div>
+	</div>
+}
+
 script closeAdminModal() {
     var element = document.getElementById("admin-modal");
 	element.classList.remove("is-active");

@@ -485,13 +485,17 @@ func (s server) handleAdminNew(w http.ResponseWriter, r *http.Request) error {
 
 	bieterID, event := m.BieterCreate()
 	if err := write(event); err != nil {
-		// TODO
 		return err
 	}
 
 	bieter := m.Bieter[bieterID]
-	template.AdminUserTable(adminBieterList(m)).Render(r.Context(), w)
-	template.AdminBieterEdit(bieter, bieter.InvalidFields()).Render(r.Context(), w)
+	if err := template.AdminUserTable(adminBieterList(m)).Render(r.Context(), w); err != nil {
+		return err
+	}
+
+	if err := template.AdminBieterEdit(bieter, bieter.InvalidFields()).Render(r.Context(), w); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -506,33 +510,32 @@ func (s server) handleAdminEdit(w http.ResponseWriter, r *http.Request) error {
 
 		bieter, ok := m.Bieter[bietID]
 		if !ok {
-			// TODO: fehlermeldung senden
-			return nil
+			return fmt.Errorf("Admin get: edit an non existing bieter")
 		}
 
 		return template.AdminBieterEdit(bieter, bieter.InvalidFields()).Render(r.Context(), w)
+
 	case http.MethodPost:
 		m, write, done := s.model.ForWriting()
 		defer done()
 		bieter, ok := m.Bieter[bietID]
 		if !ok {
-			// TODO: fehlermeldung senden
-			return nil
+			return fmt.Errorf("Admin post: edit an non existing bieter")
 		}
 
 		bieter, errMsg := parseBieterEdit(r, bieter)
 		if errMsg != "" {
-			// TODO: fehlermeldung senden
-			return nil
-			// return template.BieterEdit(bieter, "Formular kann nicht gelesen werden. Versuche es erneut").Render(r.Context(), w)
+			return fmt.Errorf("admin post: parse bieter edit: %s", errMsg)
 		}
 
 		if err := write(m.BieterUpdate(bieter)); err != nil {
-			// TODO: fehlermeldung senden
-			return nil
+			return fmt.Errorf("admin post: write bieter update event: %w", err)
 		}
 
-		template.AdminModalEmpty().Render(r.Context(), w)
+		if err := template.AdminModalEmpty().Render(r.Context(), w); err != nil {
+			return err
+		}
+
 		return template.AdminUserTable(adminBieterList(m)).Render(r.Context(), w)
 
 	default:
@@ -586,12 +589,10 @@ func (s server) handleAdminState(w http.ResponseWriter, r *http.Request) error {
 	defer done()
 
 	if err := r.ParseForm(); err != nil {
-		// TODO: show to
 		return err
 	}
 	state := model.StateFromAttr(r.Form.Get("state"))
 	if err := write(m.SetState(state)); err != nil {
-		// TODO
 		return err
 	}
 
@@ -620,6 +621,7 @@ func (s server) handleAdminCSV(w http.ResponseWriter, r *http.Request) error {
 func handleStatic() http.Handler {
 	files, err := fs.Sub(publicFiles, "files")
 	if err != nil {
+		// This only happens on startup time.
 		panic(err)
 	}
 
@@ -630,7 +632,15 @@ func handleError(handler func(w http.ResponseWriter, r *http.Request) error) htt
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := handler(w, r); err != nil {
 			log.Printf("Error: %v", err)
-			http.Error(w, err.Error(), 500)
+			if r.Header.Get("HX-Request") != "" {
+				w.Header().Add("HX-Reswap", "none")
+				if err := template.AdminError("Ups, etwas hat nicht geklappt. Bitte veresuche es erneut").Render(r.Context(), w); err == nil {
+					// exit if error == nil
+					return
+				}
+			}
+
+			http.Error(w, "Ups, something went wrong", 500)
 		}
 	}
 }
