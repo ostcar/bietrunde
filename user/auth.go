@@ -67,7 +67,7 @@ func (u User) SetCookie(w http.ResponseWriter, secred []byte) error {
 		MaxAge:   int(loginTime.Seconds()),
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode, // This is necessary for the redirect from /?biet-id=123
 	})
 
 	return nil
