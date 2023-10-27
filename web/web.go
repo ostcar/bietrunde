@@ -7,6 +7,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"hash/crc32"
 	"io/fs"
 	"log"
 	"net"
@@ -414,7 +415,11 @@ func (s server) adminPage(next func(w http.ResponseWriter, r *http.Request) erro
 			return next(w, r)
 		}
 
-		// TODO: Make a redirect on htmx requests!
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Add("HX-Refresh", "true")
+			w.WriteHeader(403)
+			return nil
+		}
 
 		switch r.Method {
 		case http.MethodGet:
@@ -449,10 +454,26 @@ func (s server) handleAdmin(w http.ResponseWriter, r *http.Request) error {
 	defer done()
 
 	bieter := adminBieterList(m)
-	if r.Header.Get("HX-Request") != "" {
+
+	if r.Header.Get("HX-Request") == "true" {
+		eTag := string(bieterETagValue(bieter))
+		w.Header().Add("ETag", eTag)
+		w.Header().Add("Vary", "HX-Request")
+
+		if r.Header.Get("If-None-Match") == eTag {
+			w.WriteHeader(http.StatusNotModified)
+			return nil
+		}
+
 		return template.AdminUserTable(bieter).Render(r.Context(), w)
 	}
 	return template.Admin(m.State, bieter).Render(r.Context(), w)
+}
+
+func bieterETagValue(bieter []model.Bieter) string {
+	h := crc32.NewIEEE()
+	fmt.Fprint(h, bieter)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func adminBieterList(m model.Model) []model.Bieter {
