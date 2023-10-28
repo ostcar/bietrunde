@@ -31,12 +31,16 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 
 	abbuchungText := "Die Abbuchung erfolgt am ersten Werktag eines Monats von April 2024 bis März 2025."
 	abbuchungBetrag := bieter.Gebot.String()
+	monatlicherBetrag := bieter.Gebot.String()
+	var abstandBetrag float64 = 5
 	if bieter.Jaehrlich {
 		abbuchungText = "Die Abbuchung erfolgt am 1. Werktag im April 2024."
 		abbuchungBetrag = (bieter.Gebot * 12).String()
 	}
 
 	if bieter.Gebot.Empty() {
+		abstandBetrag = 10
+		monatlicherBetrag = ""
 		abbuchungBetrag = ""
 	}
 
@@ -70,8 +74,8 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 			bieter.Name(), bieter.Mail),
 		),
 		text.NewRow(35,
-			`Die Gemüsevertrag gilt im oben genannten Zeitraum, daher für 12 Monate. 
-			Ich kann mein Gemüse wöchentlich an einer vorher festgelegten Verteilstelle abholen. 
+			`Der Gemüsevertrag gilt im oben genannten Zeitraum, daher für 12 Monate. 
+			Ich werde mein Gemüse wöchentlich an einer vorher festgelegten Verteilstelle abholen. 
 			Ich respektiere die in den Verteilstellen genannten Anteilsmengen und Abholfristen. 
 			Ich habe keinen Anspruch auf eine bestimmte Menge und Qualität der Produkte. 
 			Sollte es mir vorübergehend nicht möglich sein, meinen Pflichten (Abholung) nachzukommen, 
@@ -80,13 +84,13 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 			Die endgültige Abgabe meines Anteils im laufenden Jahr ist nur möglich, wenn ein anderes 
 			Vereinsmitglied, das bisher keinen Ernteanteil bezieht oder ein neues Mitglied, den 
 			oben genannten monatlichen finanziellen Beitrag für die verbleibenden Monate übernimmt. 
-			Erst ab diesem Zeitpunkt erfolgt der Lastschrifteinzug von diesem neuen Mitglied.`,
+			Erst ab Abschluss des neuen Gemüsevertrages erfolgt der Lastschrifteinzug von diesem neuen Mitglied.`,
 		),
-		text.NewRow(5,
+		text.NewRow(abstandBetrag,
 			fmt.Sprintf(`Ich hole meinen Anteil in der Verteilstelle in %s ab.`, bieter.Verteilstelle.String()),
 		),
-		text.NewRow(5,
-			fmt.Sprintf("Mein Beitrag für den Gemüseanteil beträgt pro Monat %s.", bieter.Gebot.String()),
+		text.NewRow(abstandBetrag,
+			fmt.Sprintf("Mein Beitrag für den Gemüseanteil monatlich: %s", monatlicherBetrag),
 		),
 		text.NewRow(5, abbuchungText),
 		text.NewRow(5,
@@ -115,8 +119,8 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 		}),
 		text.NewRow(5, `Gläubiger-Identifikationsnummer: DE62ZZZ00001997635`),
 		text.NewRow(5, fmt.Sprintf(`Mandatsreferenz: 24%d`, bieter.ID)),
-		text.NewRow(5, abbuchungText),
-		text.NewRow(5, fmt.Sprintf("Der Betrag lautet: %s", abbuchungBetrag), props.Text{Style: fontstyle.Bold}),
+		text.NewRow(abstandBetrag, abbuchungText),
+		text.NewRow(abstandBetrag, fmt.Sprintf("Der Betrag lautet: %s", abbuchungBetrag), props.Text{Style: fontstyle.Bold}),
 		text.NewRow(15,
 			`Ich ermächtige den Verein Solidarische Landwirtschaft Baarfood e.V. 
 			Lastschriften von meinem Konto einzuziehen. Zugleich weise ich mein 
