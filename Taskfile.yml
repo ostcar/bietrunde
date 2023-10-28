@@ -1,0 +1,55 @@
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  build:
+    desc: |
+      Builds the programm
+
+    cmds:
+      - CGO_ENABLED=0 go build
+
+    sources:
+      - "./**/*.go"
+      - web/files/*
+
+    generates:
+      - bietrunde
+
+    deps:
+      - template
+
+  
+  template:
+    desc: |
+      Regenerates the templates
+
+    cmds:
+      - go generate ./...
+
+    sources:
+      - web/template/*.templ
+
+    generates:
+      - web/template/*.go
+    
+  start:
+    desc: |
+      Starts the server. 
+      
+        Use --watch to restart the server if the source changes.
+
+        task start --watch
+
+    deps: 
+      - build
+
+    cmds:
+    - ./bietrunde
+
+    method: none
+
+    ignore_error: true

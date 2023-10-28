@@ -3,3 +3,4 @@
 /go.work.sum
 /config.toml
 /db.jsonl
+/.task

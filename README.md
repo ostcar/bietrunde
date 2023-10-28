@@ -45,3 +45,14 @@ go generate ./...
 ```
 
 neu gebaut werden.
+
+Es es gibt ein [Taskfile](https://taskfile.dev/)
+
+Mit
+
+```bash
+task start --watch
+```
+
+wird der server lokal gestartet und bei Dateiänderungen automatisch neu gebaut
+und neu gestartet.
