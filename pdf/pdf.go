@@ -80,7 +80,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 			Ich habe keinen Anspruch auf eine bestimmte Menge und Qualität der Produkte. 
 			Sollte es mir vorübergehend nicht möglich sein, meinen Pflichten (Abholung) nachzukommen, 
 			so sorge ich selbst in diesem Zeitraum für einen Ersatz. Im Falle einer Urlaubsvertretung weise 
-			ich persönlich in die Abholmodalitäten ein. Ein finanzieller Ausgleich wird privat organisiert. 
+			ich persönlich in die Abholmodalitäten ein. 
 			Die endgültige Abgabe meines Anteils im laufenden Jahr ist nur möglich, wenn ein anderes 
 			Vereinsmitglied, das bisher keinen Ernteanteil bezieht oder ein neues Mitglied, den 
 			oben genannten monatlichen finanziellen Beitrag für die verbleibenden Monate übernimmt. 
