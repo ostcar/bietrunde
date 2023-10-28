@@ -97,17 +97,19 @@ templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
 			</div>
 		case model.StateFinish:
 			<div class="box">
-				<p>
-					Die Bietrunde ist abgeschlossen.
-					if bieter.Gebot != 0 {
+				<p>Die Bietrunde ist abgeschlossen.</p>
+				if bieter.Gebot != 0 {
+					<p>Bitte trage dein monatliches Gebot von <strong>{ bieter.Gebot.String() }</strong> oben in den <a href="/vertrag" target="_blank">Vertrag</a> ein.</p>
+					<p>
+						Bitte trage dein 
 						if bieter.Jaehrlich {
-							Bitte trage dein Jahresgebot von <strong>{ (bieter.Gebot * 12).String() }</strong>
+							Jahresgebot von <strong>{ (bieter.Gebot * 12).String() }</strong>
 						} else {
-							Bitte trage dein monatliches Gebot von <strong>{ bieter.Gebot.String() }</strong>
+							Monatsgebot von <strong>{ bieter.Gebot.String() } </strong>
 						}
-						in den <a href="/vertrag" target="_blank">Vertrag</a> ein.
-					}
-				</p>
+						unten in das SEPA-Lastschriftmandat ein.
+					</p>
+				}
 			</div>
 	}
 }

@@ -29,7 +29,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 
 	m := maroto.New(cfg)
 
-	abbuchungText := "Die Abbuchung erfolgt am ersten Werktag eines Monats von April 2024 bis März 2025."
+	abbuchungText := "Die Abbuchung erfolgt jeweils am ersten Werktag eines Monats von April 2024 bis März 2025."
 	abbuchungBetrag := bieter.Gebot.String()
 	monatlicherBetrag := bieter.Gebot.String()
 	var abstandBetrag float64 = 5
@@ -91,6 +91,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 		),
 		text.NewRow(abstandBetrag,
 			fmt.Sprintf("Mein Beitrag für den Gemüseanteil monatlich: %s", monatlicherBetrag),
+			props.Text{Style: fontstyle.Bold},
 		),
 		text.NewRow(5, abbuchungText),
 		text.NewRow(5,
