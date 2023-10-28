@@ -98,6 +98,7 @@ func (s *server) registerHandlers() {
 	router.Handle("/admin/state", handleError(s.adminPage(s.handleAdminState)))
 	router.Handle("/admin/reset-gebot", handleError(s.adminPage(s.handleAdminResetGebot)))
 	router.Handle("/admin/csv", handleError(s.adminPage(s.handleAdminCSV)))
+	router.Handle("/admin/sse", handleError(s.adminPage(s.handleAdminSSE)))
 
 	s.Handler = loggingMiddleware(router)
 }
@@ -617,7 +618,7 @@ func (s server) handleAdminState(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	return template.AdminStateSelect(state).Render(r.Context(), w)
+	return template.AdminButtons(state).Render(r.Context(), w)
 }
 
 func (s server) handleAdminCSV(w http.ResponseWriter, r *http.Request) error {
@@ -637,6 +638,45 @@ func (s server) handleAdminCSV(w http.ResponseWriter, r *http.Request) error {
 	}
 	csvW.Flush()
 	return nil
+}
+
+func (s server) handleAdminSSE(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Add("Content-Type", "text/event-stream")
+	w.Header().Add("Content-Disposition", "inline")
+
+	if ok := s.sendAdminButtons(r.Context(), w); !ok {
+		return nil
+	}
+
+	s.model.Listen(r.Context())(func(events []string) bool {
+		var hasStateEvent bool
+		for _, event := range events {
+			if event == "set-state" {
+				hasStateEvent = true
+				break
+			}
+		}
+		if !hasStateEvent {
+			return true
+		}
+
+		return s.sendAdminButtons(r.Context(), w)
+	})
+	return nil
+}
+
+func (s server) sendAdminButtons(ctx context.Context, w http.ResponseWriter) bool {
+	m, done := s.model.ForReading()
+	state := m.State
+	done()
+
+	w.Write([]byte("data: "))
+	if err := template.AdminButtons(state).Render(ctx, w); err != nil {
+		return false
+	}
+	w.Write([]byte("\n\n"))
+	w.(http.Flusher).Flush()
+	return true
 }
 
 func handleStatic() http.Handler {

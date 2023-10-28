@@ -56,18 +56,37 @@ templ Admin(state model.ServiceState, bieter []model.Bieter) {
 	@layout("Admin", true) {
 		<h1 class="title is-3">Admin</h1>
 		@AdminUserTable(bieter)
-		<div class="box">
-			<div
- 				class="button is-primary"
- 				hx-post="/admin/new"
- 				hx-target="#admin-user-table"
+		<div hx-ext="sse" sse-connect="/admin/sse" sse-swap="message">
+			@AdminButtons(state)
+		</div>
+		@AdminModalEmpty()
+	}
+}
+
+templ AdminButtons(state model.ServiceState) {
+	<div id="admin-buttons" class="box">
+		<div
+ 			class="button is-primary"
+ 			hx-post="/admin/new"
+ 			hx-target="#admin-user-table"
+ 			hx-swap="outerHTML"
+		>
+			Bieter Hinzufügen
+		</div>
+		<div class="select">
+			<select
+ 				name="state"
+ 				class="button is-info"
+ 				hx-post="/admin/state"
  				hx-swap="outerHTML"
+ 				hx-target="#admin-buttons"
 			>
-				Bieter Hinzufügen
-			</div>
-			<div class="select">
-				@AdminStateSelect(state)
-			</div>
+				for _, st := range model.States() {
+					<option selected?={ state == st } value={ st.ToAttr() }>{ st.String() }</option>
+				}
+			</select>
+		</div>
+		if state == model.StateValidation {
 			<div
  				class="button is-danger"
  				hx-delete="/admin/reset-gebot"
@@ -77,30 +96,16 @@ templ Admin(state model.ServiceState, bieter []model.Bieter) {
 			>
 				Neue Bietrunde
 			</div>
-			if state == model.StateFinish {
-				<a
- 					class="button is-warning"
- 					href="/admin/csv"
-				>
-					CSV Export
-				</a>
-			}
-		</div>
-		@AdminModalEmpty()
-	}
-}
-
-templ AdminStateSelect(stateCur model.ServiceState) {
-	<select
- 		name="state"
- 		class="button is-info"
- 		hx-post="/admin/state"
- 		hx-swap="outerHTML"
-	>
-		for _, state := range model.States() {
-			<option selected?={ stateCur == state } value={ state.ToAttr() }>{ state.String() }</option>
 		}
-	</select>
+		if state == model.StateFinish {
+			<a
+ 				class="button is-warning"
+ 				href="/admin/csv"
+			>
+				CSV Export
+			</a>
+		}
+	</div>
 }
 
 templ AdminUserTable(bieter []model.Bieter) {
