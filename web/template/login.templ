@@ -24,16 +24,25 @@ templ login(fieldBietNummer string, err string) {
 		<div class="field">
 			<label class="label">Bietnummer:</label>
 			<div class="control">
-				<input name="bietnumber" class="input" type="text" placeholder="12345..." value={ fieldBietNummer }/>
+				<input
+ 					name="bietnumber"
+ 					class="input"
+ 					type="text"
+ 					placeholder="12345..."
+ 					value={ fieldBietNummer }
+ 					inputmode="numeric"
+ 					pattern={ `\d*` }
+ 					_="on load call me.focus()"
+				/>
 			</div>
 			<p class="help">Gebe die Bietnummer an, mit der du dich registriert hast.</p>
+			if err != "" {
+				<p class="help is-danger">{ err }</p>
+			}
 		</div>
 		<div class="control">
 			<button class="button is-primary" type="submit">Anmelden</button>
 		</div>
-		if err != "" {
-			<p class="help is-danger">{ err }</p>
-		}
 	</form>
 }
 
@@ -43,10 +52,10 @@ templ register(err string) {
 		<input type="hidden" name="form" value="register"/>
 		<div class="control">
 			<p>Bitte lege nur dann eine neue Bietnummer an, wenn du noch keine hast. Falls du deine Bietnummer vergessen hast, dann setze dich bitte mit dem Vorstand in Verbindung.</p>
-			<button class="button is-primary" type="submit">Neu Registrieren</button>
 			if err != "" {
 				<p class="help is-danger">{ err }</p>
 			}
+			<button class="button is-primary" type="submit">Neu Registrieren</button>
 		</div>
 	</form>
 }

@@ -3,10 +3,7 @@
 
 # Optional
 * Auto detect base url
-* Fehlermeldung über button
 
 
 # Bugs
-* Loginform: type number oder abc verbieten
 * Lösch Bestätigung mit Modal.
-* Gelöschten auf bearbeiten klicken.

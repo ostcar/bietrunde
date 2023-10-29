@@ -184,7 +184,7 @@ func (s server) handleLoginPost(w http.ResponseWriter, r *http.Request) error {
 	_, ok := m.Bieter[bieterID]
 	state := m.State
 	if !ok {
-		return template.LoginPage(state, strconv.Itoa(bieterID), "Bietnummer nicht bekannt. ", "").Render(r.Context(), w)
+		return template.LoginPage(state, r.Form.Get("bietnumber"), "Bietnummer nicht bekannt. ", "").Render(r.Context(), w)
 	}
 
 	user := user.FromID(bieterID)

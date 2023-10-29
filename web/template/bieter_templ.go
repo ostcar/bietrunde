@@ -74,7 +74,7 @@ func Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidFi
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><div hx-ext=\"sse\" sse-connect=\"/sse\" sse-swap=\"message\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><div class=\"block\" hx-ext=\"sse\" sse-connect=\"/sse\" sse-swap=\"message\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
