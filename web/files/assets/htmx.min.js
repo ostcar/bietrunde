@@ -259,11 +259,11 @@
             return responseNode;
         }
 
-        // Regex for start tags, comment start tag and custom elements start tags
+        // Regex for element, custom element and comment start tag.
+        // This regex supports more characters to be valid in tag names as defined in the HTML specs.
         // https://html.spec.whatwg.org/multipage/syntax.html#start-tags
         // https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name
-        var PCENChar = '[-.0-9_a-z\u00B7\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u037D\u037F-\u1FFF\u200C-\u200D\u203F-\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\uD800-\uDBFF\uDC00-\uDFFF]';
-        var START_TAG_REGEX = new RegExp('<((?:[a-z]' + PCENChar + '*\-' + PCENChar + '*)|(?:[a-zA-Z][a-zA-Z0-9]+))[^>]*>|<!--', 'g');
+        var START_TAG_REGEX = new RegExp('<([a-zA-Z][^\\s>]*)[^>]*>|<!--', 'g');
 
         /**
          * @param {string} resp
@@ -277,6 +277,11 @@
                 // TODO: Are these close enough for htmx to use interchangeably?
                 return documentFragment.querySelector('template').content;
             } else {
+                var appendChildNodes = function (targetElt, node) {
+                    while (node.hasChildNodes()) {
+                        targetElt.append(node.childNodes[0]);
+                    }
+                };
                 var fragment = document.createElement('body');
                 var match;
                 var nextIndex = -1;
@@ -289,8 +294,8 @@
                         continue;
                     }
 
-                    var tagName = match[1];
                     var startTag = match[0];
+                    var tagName = match[1];
                     var elementStartIndex = lastIndex - startTag.length;
                     var endTag = startTag === '<!--' ? '-->' : '</' + tagName + '>';
                     var endTagIndex = resp.indexOf(endTag, lastIndex);
@@ -298,16 +303,14 @@
                     // append leading text nodes
                     if (nextIndex < elementStartIndex) {
                         var text = resp.substring(Math.max(nextIndex, 0), elementStartIndex);
-                        fragment.appendChild(parseHTML(text, 1));
+                        // wrap into an element to preserve whitespaces on text nodes
+                        appendChildNodes(fragment, parseHTML('<div>' + text + '</div>', 1));
                     }
 
                     // void element e.g. <img>
                     if (endTagIndex === -1) {
-                        var nextStartTagIndex = resp.slice(lastIndex).search(START_TAG_REGEX);
-                        var elementEndIndex = nextStartTagIndex !== -1 ? lastIndex + nextStartTagIndex : resp.length;
-                        var elementHtml = resp.substring(elementStartIndex, elementEndIndex);
-                        fragment.appendChild(parseHTML(elementHtml, 1));
-                        nextIndex = elementEndIndex;
+                        fragment.appendChild(parseHTML(startTag, 1));
+                        nextIndex = elementStartIndex + startTag.length;
                         continue;
                     }
 
@@ -360,7 +363,8 @@
                 // append trailing text nodes
                 if (nextIndex < resp.length) {
                     var text = resp.substring(Math.max(nextIndex, 0), resp.length);
-                    fragment.appendChild(parseHTML(text, 1));
+                    // wrap into an element to preserve whitespaces on text nodes
+                    appendChildNodes(fragment, parseHTML('<div>' + text + '</div>', 1));
                 }
 
                 // @ts-ignore

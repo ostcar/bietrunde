@@ -127,26 +127,23 @@ templ AdminBieterEdit(bieter model.Bieter, fieldErrors map[string]string) {
 
 templ AdminError(msg string) {
 	@adminModalMessage("Fehler", true) {
-		<p id="modal-msg">{ msg }</p>
+		{ msg }
 	}
 }
 
 templ AdminModalEmpty() {
 	@adminModalMessage("Hinweis", false) {
-		<p id="modal-msg"></p>
 	}
 }
 
 templ adminModalInner(title string, ) {
-	<div class="modal-card">
-		<header class="modal-card-head">
-			<p id="modal-title" class="modal-card-title">{ title }</p>
-			<button class="delete" aria-label="close" _={ adminModalClose() }></button>
-		</header>
-		<section class="modal-card-body">
-			{ children... }
-		</section>
-	</div>
+	<header class="modal-card-head">
+		<p id="modal-title" class="modal-card-title">{ title }</p>
+		<button class="delete" aria-label="close" _={ adminModalClose() }></button>
+	</header>
+	<section class="modal-card-body">
+		{ children... }
+	</section>
 }
 
 templ adminModalOuter(active bool) {
@@ -166,18 +163,22 @@ templ adminModalOuter(active bool) {
 
 templ adminModalMessage(title string, show bool) {
 	@adminModalOuter(show) {
-		@adminModalInner(title) {
-			{ children... }
-		}
-		<footer class="modal-card-foot">
-			<button
- 				class="button"
- 				type="button"
- 				_={ adminModalClose() }
-			>
-				Ok
-			</button>
-		</footer>
+		<div class="modal-card">
+			@adminModalInner(title) {
+				<div id="modal-msg">
+					{ children... }
+				</div>
+			}
+			<footer class="modal-card-foot">
+				<button
+ 					class="button"
+ 					type="button"
+ 					_={ adminModalClose() }
+				>
+					Ok
+				</button>
+			</footer>
+		</div>
 	}
 }
 
@@ -188,25 +189,27 @@ templ adminModalForm(title string, submitURL string) {
  			hx-target="#admin-user-table"
  			hx-swap="outerHTML"
 		>
-			@adminModalInner(title) {
-				{ children... }
-			}
-			<footer class="modal-card-foot">
-				<button class="button is-success" type="submit">Speichern</button>
-				<button
- 					class="button"
- 					type="button"
- 					_={ adminModalClose() }
-				>
-					Abbrechen
-				</button>
-			</footer>
+			<div class="modal-card">
+				@adminModalInner(title) {
+					{ children... }
+				}
+				<footer class="modal-card-foot">
+					<button class="button is-success" type="submit">Speichern</button>
+					<button
+ 						class="button"
+ 						type="button"
+ 						_={ adminModalClose() }
+					>
+						Abbrechen
+					</button>
+				</footer>
+			</div>
 		</form>
 	}
 }
 
 func adminModalClose() string {
-	return `"on click remove .is-active to #admin-modal"`
+	return `on click remove .is-active from #admin-modal`
 }
 
 templ AdminLogin(err string) {

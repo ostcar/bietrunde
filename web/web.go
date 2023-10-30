@@ -695,7 +695,7 @@ func handleError(handler func(w http.ResponseWriter, r *http.Request) error) htt
 			log.Printf("Error: %v", err)
 			if r.Header.Get("HX-Request") != "" {
 				w.Header().Add("HX-Reswap", "none")
-				if err := template.AdminError("Ups, etwas hat nicht geklappt. Bitte veresuche es erneut").Render(r.Context(), w); err == nil {
+				if err := template.AdminError("Ups, etwas hat nicht geklappt. Bitte veresuche es erneut!").Render(r.Context(), w); err == nil {
 					// exit if error == nil
 					return
 				}
