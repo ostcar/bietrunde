@@ -66,8 +66,10 @@ templ AdminUserTable(bieter []model.Bieter) {
 		<table class="table box">
 			<thead>
 				<tr>
+					<th>Anwesend</th>
 					<th>Bietnummer</th>
 					<th>Name</th>
+					<th>Teilpartner</th>
 					<th>Gebot</th>
 					<th></th>
 				</tr>
@@ -79,8 +81,38 @@ templ AdminUserTable(bieter []model.Bieter) {
 							class="has-background-danger"
 						}
 					>
+						<th>
+							if bieter.Anwesend {
+								<button
+ 									title="Abwesend"
+ 									class="button is-success is-small"
+ 									hx-post={ "/admin/abwesend/"+ strconv.Itoa(bieter.ID) }
+ 									hx-target="#admin-user-table"
+ 									hx-swap="outerHTML"
+								>
+									🐣
+								</button>
+							} else {
+								<button
+ 									title="Anwesend"
+ 									class="button is-danger is-small"
+ 									hx-post={ "/admin/anwesend/"+ strconv.Itoa(bieter.ID) }
+ 									hx-target="#admin-user-table"
+ 									hx-swap="outerHTML"
+								>
+									🥚
+								</button>
+							}
+						</th>
 						<th><a href={ templ.URL(fmt.Sprintf("/?biet-id=%d", bieter.ID)) }>{ strconv.Itoa(bieter.ID) }</a></th>
 						<th>{ bieter.Name() }</th>
+						<th>
+							if bieter.Teilpartner == "" {
+								-
+							} else {
+								{ bieter.Teilpartner }
+							}
+						</th>
 						<th>
 							if bieter.Gebot.Empty() {
 								-
@@ -90,11 +122,13 @@ templ AdminUserTable(bieter []model.Bieter) {
 						</th>
 						<th>
 							<button
+ 								title="Bearbeiten"
  								class="button is-warning is-small"
  								hx-get={ "/admin/edit/"+ strconv.Itoa(bieter.ID) }
  								hx-swap="none"
 							>✎</button>
 							<button
+ 								title="Bieter Löschen"
  								class="button is-danger is-small"
  								hx-delete={ "/admin/delete/"+ strconv.Itoa(bieter.ID) }
  								hx-confirm={ bieter.Name() + " wirklich löschen?" }
@@ -110,6 +144,7 @@ templ AdminUserTable(bieter []model.Bieter) {
 			<ul>
 				<li>Es gibt <strong>{ strconv. Itoa(len(bieter )) }</strong> Bieter.</li>
 				<li>Davon <strong>{ bieterWithName(bieter) }</strong> mit Namen.</li>
+				<li>Anwesend sind <strong>{ bieterAnwesend(bieter) }</strong>.</li>
 				<li>Es wurden <strong>{ gebotCount(bieter) }</strong> Gebote abgegeben.</li>
 				<li>Das gesamte monatliche Gebot ist <strong>{ gesamtGebot(bieter).String() }</strong>.</li>
 				<li>Das gesamte jährliche Gebot ist <strong>{ (gesamtGebot(bieter)*12).String() }</strong>.</li>
@@ -236,6 +271,16 @@ func bieterWithName(bieter []model.Bieter) string {
 	var count int
 	for _, b := range bieter {
 		if b.Name() != "" {
+			count++
+		}
+	}
+	return strconv.Itoa(count)
+}
+
+func bieterAnwesend(bieter []model.Bieter) string {
+	var count int
+	for _, b := range bieter {
+		if b.Anwesend {
 			count++
 		}
 	}

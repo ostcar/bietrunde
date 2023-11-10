@@ -25,6 +25,8 @@ func GetEvent(eventType string) Event {
 		return &eventGebot{}
 	case eventResetGebot{}.Name():
 		return &eventResetGebot{}
+	case eventSetAnwesend{}.Name():
+		return &eventSetAnwesend{}
 	default:
 		return nil
 	}
@@ -159,5 +161,29 @@ func (e eventResetGebot) Execute(model Model, time time.Time) Model {
 		bieter.Gebot = 0
 		model.Bieter[k] = bieter
 	}
+	return model
+}
+
+type eventSetAnwesend struct {
+	BietID   int  `json:"bieter"`
+	Anwesend bool `json:"anwesend"`
+}
+
+func (e eventSetAnwesend) Name() string {
+	return "anwesend"
+}
+
+func (e eventSetAnwesend) Validate(model Model) error {
+	if _, ok := model.Bieter[e.BietID]; !ok {
+		return fmt.Errorf("bieter does not exist")
+	}
+
+	return nil
+}
+
+func (e eventSetAnwesend) Execute(model Model, time time.Time) Model {
+	bieter := model.Bieter[e.BietID]
+	bieter.Anwesend = e.Anwesend
+	model.Bieter[e.BietID] = bieter
 	return model
 }

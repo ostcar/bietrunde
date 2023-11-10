@@ -7,6 +7,23 @@ import (
 templ LoginPage(state model.ServiceState, fieldBietNummer string, loginErr, registerErr string) {
 	@layout("login", false) {
 		<section class="box">
+			<h1 class="title is-3">Willkommen zur Bietrunde für das Gemüsejahr 2024/2025</h1>
+			if state == model.StateRegistration {
+				<p>
+					Hier kannst du dich für das kommende Gemüsejahr anmelden. 
+					Wenn zum ersten mal die Seite besuchst, dann lege dir eine neue Bietnummer an. 
+					Wenn du bereits eine Bietnummer hast, dann kannst du dich mit dieser anmelden.
+				</p>
+				<p>
+					Die Bietnummer ist nur für dieses Jahr. Die Nummer vom letzten Jahr ist nicht mehr gültig..
+				</p>
+			} else {
+				<p>
+					Die Anmeldung ist abgeschlossen. Wenn du vergessen hast dich zu registrieren, dann setze dich bitte mit dem Vorstand in Verbindung.
+				</p>
+			}
+		</section>
+		<section class="box">
 			@login(fieldBietNummer, loginErr)
 		</section>
 		if state == model.StateRegistration {

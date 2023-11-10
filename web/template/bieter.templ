@@ -90,9 +90,15 @@ templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
 			</div>
 		case model.StateOffer:
 			<div class="box">
-				<p><strong>Dein monatliches Gebot:</strong> { bieter.Gebot.String() }</p>
-				if state == model.StateOffer {
-					@gebotForm(bieter.Gebot, err)
+				if bieter.Anwesend {
+					<p><strong>Dein monatliches Gebot:</strong> { bieter.Gebot.String() }</p>
+					if state == model.StateOffer {
+						@gebotForm(bieter.Gebot, err)
+					}
+				} else {
+					<p>
+						<strong>Du bist nicht als anwesend registriert.</strong> Bitte melde dich beim Vorstand.
+					</p>
 				}
 			</div>
 		case model.StateFinish:

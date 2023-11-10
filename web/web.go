@@ -95,6 +95,8 @@ func (s *server) registerHandlers() {
 	router.Handle("/admin/new", handleError(s.adminPage(s.handleAdminNew)))
 	router.Handle("/admin/edit/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminEdit)))
 	router.Handle("/admin/delete/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminDelete)))
+	router.Handle("/admin/anwesend/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminAnwesend)))
+	router.Handle("/admin/abwesend/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminAbwesend)))
 	router.Handle("/admin/state", handleError(s.adminPage(s.handleAdminState)))
 	router.Handle("/admin/reset-gebot", handleError(s.adminPage(s.handleAdminResetGebot)))
 	router.Handle("/admin/csv", handleError(s.adminPage(s.handleAdminCSV)))
@@ -226,6 +228,14 @@ func (s server) handleBieterDetail(w http.ResponseWriter, r *http.Request, state
 
 		if r.Form.Get("form") != "gebot" {
 			return template.Bieter(state, bieter, "", invalidFields).Render(r.Context(), w)
+		}
+
+		if state != model.StateOffer {
+			return template.Bieter(state, bieter, "Aktuell kann kein Gebot abgegeben werden.", invalidFields).Render(r.Context(), w)
+		}
+
+		if !bieter.Anwesend {
+			return template.Bieter(state, bieter, "Du musst anwesend sein um ein Gebot abzugeben.", invalidFields).Render(r.Context(), w)
 		}
 
 		gebot, err := model.GebotFromString(r.Form.Get("gebot"))
@@ -577,6 +587,42 @@ func (s server) handleAdminDelete(w http.ResponseWriter, r *http.Request) error 
 
 	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
 	if err := write(m.BieterDelete(bietID)); err != nil {
+		return err
+	}
+
+	bieter := adminBieterList(m)
+	return template.AdminUserTable(bieter).Render(r.Context(), w)
+}
+
+func (s server) handleAdminAnwesend(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Hier wird nur geupdated", http.StatusMethodNotAllowed)
+		return nil
+	}
+
+	m, write, done := s.model.ForWriting()
+	defer done()
+
+	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
+	if err := write(m.BieterSetAnwesend(bietID, true)); err != nil {
+		return err
+	}
+
+	bieter := adminBieterList(m)
+	return template.AdminUserTable(bieter).Render(r.Context(), w)
+}
+
+func (s server) handleAdminAbwesend(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Hier wird nur geupdated", http.StatusMethodNotAllowed)
+		return nil
+	}
+
+	m, write, done := s.model.ForWriting()
+	defer done()
+
+	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
+	if err := write(m.BieterSetAnwesend(bietID, false)); err != nil {
 		return err
 	}
 

@@ -75,6 +75,7 @@ type Bieter struct {
 	Kontoinhaber  string        `json:"kontoinhaber"`
 	Jaehrlich     bool          `json:"jaehrlich"`
 	Gebot         Gebot         `json:"gebot"`
+	Anwesend      bool          `json:"anwesend"`
 }
 
 // Name returns the full name.
@@ -258,4 +259,9 @@ func (m Model) SetGebot(bietID int, gebot Gebot) Event {
 // ResetGebot sets all gebote to 0.
 func (m Model) ResetGebot() Event {
 	return eventResetGebot{}
+}
+
+// BieterSetAnwesend deletes a bieter.
+func (m Model) BieterSetAnwesend(id int, anwesend bool) Event {
+	return eventSetAnwesend{BietID: id, Anwesend: anwesend}
 }
