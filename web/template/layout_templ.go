@@ -31,7 +31,7 @@ func layout(name string, showLogout bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"icon\" href=\"data:,\"><link rel=\"stylesheet\" href=\"/assets/bulma-0.9.4/bulma/css/bulma.min.css\" integrity=\"sha384-HmYpsz2Aa9Gh3JlkCoh8kUJ2mUKJKTnkyC2Lzt8aLzpPOpnDe8KpFE2xNiBpMDou\"><script src=\"/assets/htmx.min.js\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"icon\" href=\"data:,\"><link rel=\"stylesheet\" href=\"/assets/bulma-0.9.4/bulma/css/bulma.min.css\" integrity=\"sha384-HmYpsz2Aa9Gh3JlkCoh8kUJ2mUKJKTnkyC2Lzt8aLzpPOpnDe8KpFE2xNiBpMDou\"><link rel=\"stylesheet\" href=\"/assets/style.css\"><script src=\"/assets/htmx.min.js\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

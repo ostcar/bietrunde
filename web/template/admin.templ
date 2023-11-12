@@ -63,10 +63,10 @@ templ AdminButtons(state model.ServiceState) {
 
 templ AdminUserTable(bieter []model.Bieter) {
 	<div id="admin-user-table" hx-get="/admin" hx-trigger="every 2s">
-		<table class="table box">
+		<table class="table box" style="overflow-x: auto">
 			<thead>
 				<tr>
-					<th>Anwesend</th>
+					<th title="Anwesend">🐤</th>
 					<th>Bietnummer</th>
 					<th>Name</th>
 					<th>Teilpartner</th>
@@ -78,13 +78,13 @@ templ AdminUserTable(bieter []model.Bieter) {
 				for _, bieter := range bieter {
 					<tr
  						if len(bieter.InvalidFields()) != 0 {
-							class="has-background-danger"
+							class="has-background-danger-light"
 						}
 					>
-						<th>
+						<td>
 							if bieter.Anwesend {
 								<button
- 									title="Abwesend"
+ 									title="Anwesend"
  									class="button is-success is-small"
  									hx-post={ "/admin/abwesend/"+ strconv.Itoa(bieter.ID) }
  									hx-target="#admin-user-table"
@@ -94,7 +94,7 @@ templ AdminUserTable(bieter []model.Bieter) {
 								</button>
 							} else {
 								<button
- 									title="Anwesend"
+ 									title="Abwesend"
  									class="button is-danger is-small"
  									hx-post={ "/admin/anwesend/"+ strconv.Itoa(bieter.ID) }
  									hx-target="#admin-user-table"
@@ -103,24 +103,24 @@ templ AdminUserTable(bieter []model.Bieter) {
 									🥚
 								</button>
 							}
-						</th>
-						<th><a href={ templ.URL(fmt.Sprintf("/?biet-id=%d", bieter.ID)) }>{ strconv.Itoa(bieter.ID) }</a></th>
-						<th>{ bieter.Name() }</th>
-						<th>
+						</td>
+						<td><a href={ templ.URL(fmt.Sprintf("/?biet-id=%d", bieter.ID)) }>{ strconv.Itoa(bieter.ID) }</a></td>
+						<td>{ bieter.Name() }</td>
+						<td>
 							if bieter.Teilpartner == "" {
 								-
 							} else {
-								{ bieter.Teilpartner }
+								{ maxLength(bieter.Teilpartner, 20) }
 							}
-						</th>
-						<th>
+						</td>
+						<td>
 							if bieter.Gebot.Empty() {
 								-
 							} else {
 								Ja
 							}
-						</th>
-						<th>
+						</td>
+						<td style="min-width:110px">
 							<button
  								title="Bearbeiten"
  								class="button is-warning is-small"
@@ -135,7 +135,7 @@ templ AdminUserTable(bieter []model.Bieter) {
  								hx-target="#admin-user-table"
  								hx-swap="outerHTML"
 							>🗑</button>
-						</th>
+						</td>
 					</tr>
 				}
 			</tbody>
@@ -152,6 +152,17 @@ templ AdminUserTable(bieter []model.Bieter) {
 			</ul>
 		</div>
 	</div>
+}
+
+func maxLength(str string, l int) string {
+	if l < 4 {
+		l = 4
+	}
+
+	if len(str) <= l {
+		return str
+	}
+	return str[:l-3] + "..."
 }
 
 templ AdminBieterEdit(bieter model.Bieter, fieldErrors map[string]string) {

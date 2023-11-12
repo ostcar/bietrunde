@@ -200,11 +200,11 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		templ_7745c5c3_Ctx = templ.ClearChildren(templ_7745c5c3_Ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"admin-user-table\" hx-get=\"/admin\" hx-trigger=\"every 2s\"><table class=\"table box\"><thead><tr><th>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"admin-user-table\" hx-get=\"/admin\" hx-trigger=\"every 2s\"><table class=\"table box\" style=\"overflow-x: auto\"><thead><tr><th title=\"Anwesend\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Var10 := `Anwesend`
+		templ_7745c5c3_Var10 := `🐤`
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -255,17 +255,17 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(bieter.InvalidFields()) != 0 {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"has-background-danger\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"has-background-danger-light\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("><th>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if bieter.Anwesend {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button title=\"Abwesend\" class=\"button is-success is-small\" hx-post=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button title=\"Anwesend\" class=\"button is-success is-small\" hx-post=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -287,7 +287,7 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button title=\"Anwesend\" class=\"button is-danger is-small\" hx-post=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button title=\"Abwesend\" class=\"button is-danger is-small\" hx-post=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -309,7 +309,7 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th><a href=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</td><td><a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -327,7 +327,7 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</a></th><th>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</a></td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -336,7 +336,7 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -347,13 +347,13 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				var templ_7745c5c3_Var21 string = bieter.Teilpartner
+				var templ_7745c5c3_Var21 string = maxLength(bieter.Teilpartner, 20)
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -370,7 +370,7 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th><button title=\"Bearbeiten\" class=\"button is-warning is-small\" hx-get=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</td><td style=\"min-width:110px\"><button title=\"Bearbeiten\" class=\"button is-warning is-small\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -412,7 +412,7 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button></th></tr>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button></td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -615,6 +615,17 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 		}
 		return templ_7745c5c3_Err
 	})
+}
+
+func maxLength(str string, l int) string {
+	if l < 4 {
+		l = 4
+	}
+
+	if len(str) <= l {
+		return str
+	}
+	return str[:l-3] + "..."
 }
 
 func AdminBieterEdit(bieter model.Bieter, fieldErrors map[string]string) templ.Component {
