@@ -76,6 +76,7 @@ type Bieter struct {
 	Jaehrlich     bool          `json:"jaehrlich"`
 	Gebot         Gebot         `json:"gebot"`
 	Anwesend      bool          `json:"anwesend"`
+	CanSelfEdit   bool          `json:"can_edit"`
 }
 
 // Name returns the full name.
@@ -264,4 +265,9 @@ func (m Model) ResetGebot() Event {
 // BieterSetAnwesend deletes a bieter.
 func (m Model) BieterSetAnwesend(id int, anwesend bool) Event {
 	return eventSetAnwesend{BietID: id, Anwesend: anwesend}
+}
+
+// BieterSetCanSelfEdit sets the attribute CanSelfEdit.
+func (m Model) BieterSetCanSelfEdit(id int, canEdit bool) Event {
+	return eventSetCanSelfEdit{BietID: id, CanSelfEdit: canEdit}
 }

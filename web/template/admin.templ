@@ -77,8 +77,16 @@ templ AdminUserTable(bieter []model.Bieter) {
 			<tbody>
 				for _, bieter := range bieter {
 					<tr
+ 						if len(bieter.InvalidFields()) != 0 && bieter.CanSelfEdit {
+							class="has-background-danger"
+						}
+ 						else
  						if len(bieter.InvalidFields()) != 0 {
 							class="has-background-danger-light"
+						}
+ 						else
+ 						if bieter.CanSelfEdit {
+							class="has-background-warning-light"
 						}
 					>
 						<td>
@@ -121,6 +129,23 @@ templ AdminUserTable(bieter []model.Bieter) {
 							}
 						</td>
 						<td style="min-width:110px">
+							if bieter.CanSelfEdit {
+								<button
+ 									title="CanSelfEdit"
+ 									class="button is-warning is-small"
+ 									hx-post={ "/admin/can_not_self_edit/"+strconv.Itoa(bieter.ID) }
+ 									hx-target="#admin-user-table"
+ 									hx-swap="outerHTML"
+								>🔓</button>
+							} else {
+								<button
+ 									title="CanSelfEdit"
+ 									class="button is-warning is-small"
+ 									hx-post={ "/admin/can_self_edit/"+strconv.Itoa(bieter.ID) }
+ 									hx-target="#admin-user-table"
+ 									hx-swap="outerHTML"
+								>🔒</button>
+							}
 							<button
  								title="Bearbeiten"
  								class="button is-warning is-small"

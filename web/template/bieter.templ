@@ -46,7 +46,7 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 				@abbuchung(bieter.Jaehrlich)
 			</dd>
 		</dl>
-		if state == model.StateRegistration {
+		if state == model.StateRegistration || state == model.StateValidation && bieter.CanSelfEdit {
 			<a href="/edit" class="block button is-primary">Bearbeiten</a>
 		}
 	}
@@ -84,6 +84,8 @@ templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
 			<div class="box">
 				if len(bieter.InvalidFields()) == 0 {
 					Bitte drucke vor der Bietrunde den <a href="/vertrag" target="_blank">Vertrag</a> aus und bringe ihn mit!
+				} else if bieter.CanSelfEdit {
+					Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
 				} else {
 					Deine Daten sind nicht valide. Bitte setze dich mit dem Vorstand in Verbindung.
 				}

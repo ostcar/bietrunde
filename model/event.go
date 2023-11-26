@@ -27,6 +27,8 @@ func GetEvent(eventType string) Event {
 		return &eventResetGebot{}
 	case eventSetAnwesend{}.Name():
 		return &eventSetAnwesend{}
+	case eventSetCanSelfEdit{}.Name():
+		return &eventSetCanSelfEdit{}
 	default:
 		return nil
 	}
@@ -184,6 +186,30 @@ func (e eventSetAnwesend) Validate(model Model) error {
 func (e eventSetAnwesend) Execute(model Model, time time.Time) Model {
 	bieter := model.Bieter[e.BietID]
 	bieter.Anwesend = e.Anwesend
+	model.Bieter[e.BietID] = bieter
+	return model
+}
+
+type eventSetCanSelfEdit struct {
+	BietID      int  `json:"bieter"`
+	CanSelfEdit bool `json:"can_self_edit"`
+}
+
+func (e eventSetCanSelfEdit) Name() string {
+	return "self_edit"
+}
+
+func (e eventSetCanSelfEdit) Validate(model Model) error {
+	if _, ok := model.Bieter[e.BietID]; !ok {
+		return fmt.Errorf("bieter does not exist")
+	}
+
+	return nil
+}
+
+func (e eventSetCanSelfEdit) Execute(model Model, time time.Time) Model {
+	bieter := model.Bieter[e.BietID]
+	bieter.CanSelfEdit = e.CanSelfEdit
 	model.Bieter[e.BietID] = bieter
 	return model
 }

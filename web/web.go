@@ -97,6 +97,8 @@ func (s *server) registerHandlers() {
 	router.Handle("/admin/delete/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminDelete)))
 	router.Handle("/admin/anwesend/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminAnwesend)))
 	router.Handle("/admin/abwesend/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminAbwesend)))
+	router.Handle("/admin/can_self_edit/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminSetCanSelfEdit)))
+	router.Handle("/admin/can_not_self_edit/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminSetCanNotSelfEdit)))
 	router.Handle("/admin/state", handleError(s.adminPage(s.handleAdminState)))
 	router.Handle("/admin/reset-gebot", handleError(s.adminPage(s.handleAdminResetGebot)))
 	router.Handle("/admin/csv", handleError(s.adminPage(s.handleAdminCSV)))
@@ -260,6 +262,10 @@ func (s server) handleBieterDetail(w http.ResponseWriter, r *http.Request, state
 	}
 }
 
+func canEdit(state model.ServiceState, bieter model.Bieter) bool {
+	return state == model.StateRegistration || (state == model.StateValidation && bieter.CanSelfEdit)
+}
+
 func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
 	if err != nil || user.BieterID == 0 {
@@ -272,15 +278,15 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 		m, done := s.model.ForReading()
 		defer done()
 
-		if m.State != model.StateRegistration {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return nil
-		}
-
 		bieter, ok := m.Bieter[user.BieterID]
 
 		if user.IsAnonymous() || !ok {
 			return template.LoginPage(m.State, "", "", "").Render(r.Context(), w)
+		}
+
+		if !canEdit(m.State, bieter) {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return nil
 		}
 
 		return template.BieterEdit(bieter, bieter.InvalidFields()).Render(r.Context(), w)
@@ -289,13 +295,13 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 		m, write, done := s.model.ForWriting()
 		defer done()
 
-		if m.State != model.StateRegistration {
+		bieter, ok := m.Bieter[user.BieterID]
+		if !ok {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return nil
 		}
 
-		bieter, ok := m.Bieter[user.BieterID]
-		if !ok {
+		if !canEdit(m.State, bieter) {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return nil
 		}
@@ -605,6 +611,42 @@ func (s server) handleAdminAnwesend(w http.ResponseWriter, r *http.Request) erro
 
 	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
 	if err := write(m.BieterSetAnwesend(bietID, true)); err != nil {
+		return err
+	}
+
+	bieter := adminBieterList(m)
+	return template.AdminUserTable(bieter).Render(r.Context(), w)
+}
+
+func (s server) handleAdminSetCanSelfEdit(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Hier wird nur geupdated", http.StatusMethodNotAllowed)
+		return nil
+	}
+
+	m, write, done := s.model.ForWriting()
+	defer done()
+
+	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
+	if err := write(m.BieterSetCanSelfEdit(bietID, true)); err != nil {
+		return err
+	}
+
+	bieter := adminBieterList(m)
+	return template.AdminUserTable(bieter).Render(r.Context(), w)
+}
+
+func (s server) handleAdminSetCanNotSelfEdit(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Hier wird nur geupdated", http.StatusMethodNotAllowed)
+		return nil
+	}
+
+	m, write, done := s.model.ForWriting()
+	defer done()
+
+	bietID, _ := strconv.Atoi(mux.Vars(r)["id"])
+	if err := write(m.BieterSetCanSelfEdit(bietID, false)); err != nil {
 		return err
 	}
 
