@@ -29,12 +29,12 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 
 	m := maroto.New(cfg)
 
-	abbuchungText := "Die Abbuchung erfolgt jeweils am ersten Werktag eines Monats von April 2024 bis März 2025."
+	abbuchungText := "Die Abbuchung erfolgt jeweils am ersten Werktag eines Monats von April 2025 bis März 2026."
 	abbuchungBetrag := bieter.Gebot.String()
 	monatlicherBetrag := bieter.Gebot.String()
 	var abstandBetrag float64 = 5
 	if bieter.Jaehrlich {
-		abbuchungText = "Die Abbuchung erfolgt am 1. Werktag im April 2024."
+		abbuchungText = "Die Abbuchung erfolgt am 1. Werktag im April 2025."
 		abbuchungBetrag = (bieter.Gebot * 12).String()
 	}
 
@@ -70,7 +70,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 		// Vertragstext
 		text.NewRow(10, fmt.Sprintf(`
 			Ich, %s (E-Mail: %s ), bin Mitglied im des Vereins Solidarische Landwirtschaft Baarfood e.V. 
-			und möchte im Gemüsejahr 2024/2025 (April 2024 – März 2025) einen Gemüseanteil beziehen.`,
+			und möchte im Gemüsejahr 2025/2026 (April 2025 – März 2026) einen Gemüseanteil beziehen.`,
 			bieter.Name(), bieter.Mail),
 		),
 		text.NewRow(35,
