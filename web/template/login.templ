@@ -15,7 +15,7 @@ templ LoginPage(state model.ServiceState, fieldBietNummer string, loginErr, regi
 					Wenn du bereits eine Bietnummer hast, dann kannst du dich mit dieser anmelden.
 				</p>
 				<p>
-					Die Bietnummer ist nur für dieses Jahr. Die Nummer vom letzten Jahr ist nicht mehr gültig..
+					<strong>Die Bietnummer ist nur für dieses Jahr. Die Nummer vom letzten Jahr ist nicht mehr gültig.</strong>
 				</p>
 			} else {
 				<p>
@@ -23,14 +23,14 @@ templ LoginPage(state model.ServiceState, fieldBietNummer string, loginErr, regi
 				</p>
 			}
 		</section>
-		<section class="box">
-			@login(fieldBietNummer, loginErr)
-		</section>
 		if state == model.StateRegistration {
 			<section class="box">
 				@register(registerErr)
 			</section>
 		}
+		<section class="box">
+			@login(fieldBietNummer, loginErr)
+		</section>
 	}
 }
 
