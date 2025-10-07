@@ -373,18 +373,10 @@ func (s server) handleSSE(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	s.model.Listen(r.Context())(func(events []string) bool {
-		var hasStateEvent bool
-		for _, event := range events {
-			if event == "set-state" {
-				hasStateEvent = true
-				break
-			}
+		if slices.Contains(events, "set-state") {
+			return s.sendGebotShow(r.Context(), w, u.BieterID)
 		}
-		if !hasStateEvent {
-			return true
-		}
-
-		return s.sendGebotShow(r.Context(), w, u.BieterID)
+		return true
 	})
 	return nil
 }
@@ -737,18 +729,10 @@ func (s server) handleAdminSSE(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	s.model.Listen(r.Context())(func(events []string) bool {
-		var hasStateEvent bool
-		for _, event := range events {
-			if event == "set-state" {
-				hasStateEvent = true
-				break
-			}
+		if slices.Contains(events, "set-state") {
+			return s.sendAdminButtons(r.Context(), w)
 		}
-		if !hasStateEvent {
-			return true
-		}
-
-		return s.sendAdminButtons(r.Context(), w)
+		return true
 	})
 	return nil
 }

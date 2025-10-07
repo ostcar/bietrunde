@@ -74,7 +74,7 @@ func CreatePassword(length int) string {
 		"abcdefghijklmnopqrstuvwxyzåäö" +
 		"0123456789")
 	var b strings.Builder
-	for i := 0; i < length; i++ {
+	for range length {
 		b.WriteRune(chars[rand.Intn(len(chars))])
 	}
 	return b.String()

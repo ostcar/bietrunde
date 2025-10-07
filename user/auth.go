@@ -30,7 +30,7 @@ func FromRequest(r *http.Request, secret []byte) (User, error) {
 
 	var user User
 
-	if _, err = jwt.ParseWithClaims(cookie.Value, &user, func(token *jwt.Token) (interface{}, error) {
+	if _, err = jwt.ParseWithClaims(cookie.Value, &user, func(token *jwt.Token) (any, error) {
 		return secret, nil
 	}); err != nil {
 		return User{}, fmt.Errorf("parsing token: %w", err)
