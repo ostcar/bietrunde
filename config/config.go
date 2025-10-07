@@ -14,7 +14,7 @@ import (
 type Config struct {
 	WebListenAddr string `toml:"web_listen_addr"`
 	AdminToken    string `toml:"admin_token"`
-	Secred        string `toml:"secred"`
+	Secret        string `toml:"secret"`
 	BaseURL       string `toml:"base_url"`
 }
 
@@ -23,7 +23,7 @@ func defaultConfig() Config {
 	return Config{
 		WebListenAddr: "localhost:8080",
 		AdminToken:    CreatePassword(8),
-		Secred:        CreatePassword(32),
+		Secret:        CreatePassword(32),
 		BaseURL:       "http://localhost",
 	}
 }

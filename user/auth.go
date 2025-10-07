@@ -22,7 +22,7 @@ type User struct {
 }
 
 // FromRequest reads the user from a request.
-func FromRequest(r *http.Request, secred []byte) (User, error) {
+func FromRequest(r *http.Request, secret []byte) (User, error) {
 	cookie, err := r.Cookie(authCookieName)
 	if err != nil {
 		return User{}, fmt.Errorf("reading cookie: %w", err)
@@ -31,7 +31,7 @@ func FromRequest(r *http.Request, secred []byte) (User, error) {
 	var user User
 
 	if _, err = jwt.ParseWithClaims(cookie.Value, &user, func(token *jwt.Token) (interface{}, error) {
-		return secred, nil
+		return secret, nil
 	}); err != nil {
 		return User{}, fmt.Errorf("parsing token: %w", err)
 	}
@@ -52,10 +52,10 @@ func (u User) IsAnonymous() bool {
 }
 
 // SetCookie sets the cookie to the response.
-func (u User) SetCookie(w http.ResponseWriter, secred []byte) error {
+func (u User) SetCookie(w http.ResponseWriter, secret []byte) error {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, u)
 
-	tokenString, err := token.SignedString(secred)
+	tokenString, err := token.SignedString(secret)
 	if err != nil {
 		return fmt.Errorf("signing token: %w", err)
 	}

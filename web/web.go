@@ -114,7 +114,7 @@ func (s server) handleLogout(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
-	u, _ := user.FromRequest(r, []byte(s.cfg.Secred))
+	u, _ := user.FromRequest(r, []byte(s.cfg.Secret))
 	if bietID := r.URL.Query().Get("biet-id"); bietID != "" {
 		m, done := s.model.ForReading()
 		defer done()
@@ -126,7 +126,7 @@ func (s server) handleHome(w http.ResponseWriter, r *http.Request) error {
 			return s.showLoginPage(r.Context(), w, state, "", "")
 		}
 
-		u.SetCookie(w, []byte(s.cfg.Secred))
+		u.SetCookie(w, []byte(s.cfg.Secret))
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
 	}
@@ -192,7 +192,7 @@ func (s server) handleLoginPost(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	user := user.FromID(bieterID)
-	user.SetCookie(w, []byte(s.cfg.Secred))
+	user.SetCookie(w, []byte(s.cfg.Secret))
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return nil
 }
@@ -212,7 +212,7 @@ func (s server) handleRegisterPost(w http.ResponseWriter, r *http.Request) error
 	}
 
 	user := user.FromID(bieterID)
-	user.SetCookie(w, []byte(s.cfg.Secred))
+	user.SetCookie(w, []byte(s.cfg.Secret))
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return nil
 }
@@ -267,7 +267,7 @@ func canEdit(state model.ServiceState, bieter model.Bieter) bool {
 }
 
 func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
-	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+	user, err := user.FromRequest(r, []byte(s.cfg.Secret))
 	if err != nil || user.BieterID == 0 {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
@@ -329,7 +329,7 @@ func (s server) handleEdit(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s server) handleVertrag(w http.ResponseWriter, r *http.Request) error {
-	user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+	user, err := user.FromRequest(r, []byte(s.cfg.Secret))
 	if err != nil || user.BieterID == 0 {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
@@ -358,7 +358,7 @@ func (s server) handleSSE(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Add("Content-Type", "text/event-stream")
 	w.Header().Add("Content-Disposition", "inline")
 
-	u, err := user.FromRequest(r, []byte(s.cfg.Secred))
+	u, err := user.FromRequest(r, []byte(s.cfg.Secret))
 	if err != nil {
 		return err
 	}
@@ -427,7 +427,7 @@ func parseBieterEdit(r *http.Request, bieter model.Bieter) (model.Bieter, string
 
 func (s server) adminPage(next func(w http.ResponseWriter, r *http.Request) error) func(w http.ResponseWriter, r *http.Request) error {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		user, err := user.FromRequest(r, []byte(s.cfg.Secred))
+		user, err := user.FromRequest(r, []byte(s.cfg.Secret))
 		if err == nil && user.IsAdmin {
 			return next(w, r)
 		}
@@ -453,7 +453,7 @@ func (s server) adminPage(next func(w http.ResponseWriter, r *http.Request) erro
 			}
 
 			user.IsAdmin = true
-			user.SetCookie(w, []byte(s.cfg.Secred))
+			user.SetCookie(w, []byte(s.cfg.Secret))
 
 			http.Redirect(w, r, "/admin", http.StatusSeeOther)
 
