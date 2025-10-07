@@ -174,6 +174,9 @@ templ AdminUserTable(bieter []model.Bieter) {
 				<li>Das gesamte monatliche Gebot ist <strong>{ gesamtGebot(bieter).String() }</strong>.</li>
 				<li>Das gesamte jährliche Gebot ist <strong>{ (gesamtGebot(bieter)*12).String() }</strong>.</li>
 				<li>Das durchschnittliche monatliche Gebot liegt bei <strong>{ averageGebot(bieter).String() }</strong>.</li>
+				<li>Abnehmer in Villingen <strong>{ countVerteilstelle(bieter, model.VerteilstelleVillingen) }</strong>.</li>
+				<li>Abnehmer in Schwenningen <strong>{ countVerteilstelle(bieter, model.VerteilstelleSchwenningen) }</strong>.</li>
+				<li>Abnehmer in Überauchen <strong>{ countVerteilstelle(bieter, model.VerteilstelleUeberauchen) }</strong>.</li>
 			</ul>
 		</div>
 	</div>
@@ -357,4 +360,14 @@ func gebotCount(bieter []model.Bieter) string {
 		}
 	}
 	return strconv.Itoa(gebotCount)
+}
+
+func countVerteilstelle(bieter []model.Bieter, verteilstelle model.Verteilstelle) string {
+	var count int
+	for _, b := range bieter {
+		if b.Verteilstelle == verteilstelle {
+			count += 1
+		}
+	}
+	return strconv.Itoa(count)
 }

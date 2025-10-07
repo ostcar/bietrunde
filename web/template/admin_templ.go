@@ -675,6 +675,87 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</li><li>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var49 := `Abnehmer in Villingen `
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<strong>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var50 string = countVerteilstelle(bieter, model.VerteilstelleVillingen)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</strong>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var51 := `.`
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var51)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</li><li>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var52 := `Abnehmer in Schwenningen `
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<strong>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var53 string = countVerteilstelle(bieter, model.VerteilstelleSchwenningen)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</strong>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var54 := `.`
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var54)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</li><li>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var55 := `Abnehmer in Überauchen `
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var55)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<strong>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var56 string = countVerteilstelle(bieter, model.VerteilstelleUeberauchen)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var56))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</strong>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var57 := `.`
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</li></ul></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -705,12 +786,12 @@ func AdminBieterEdit(bieter model.Bieter, fieldErrors map[string]string) templ.C
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		templ_7745c5c3_Ctx = templ.InitializeContext(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var49 := templ.GetChildren(templ_7745c5c3_Ctx)
-		if templ_7745c5c3_Var49 == nil {
-			templ_7745c5c3_Var49 = templ.NopComponent
+		templ_7745c5c3_Var58 := templ.GetChildren(templ_7745c5c3_Ctx)
+		if templ_7745c5c3_Var58 == nil {
+			templ_7745c5c3_Var58 = templ.NopComponent
 		}
 		templ_7745c5c3_Ctx = templ.ClearChildren(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var50 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var59 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 			if !templ_7745c5c3_IsBuffer {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
@@ -725,7 +806,7 @@ func AdminBieterEdit(bieter model.Bieter, fieldErrors map[string]string) templ.C
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = adminModalForm(bieter.Name(), "/admin/edit/"+strconv.Itoa(bieter.ID)).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var50), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = adminModalForm(bieter.Name(), "/admin/edit/"+strconv.Itoa(bieter.ID)).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var59), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -744,19 +825,19 @@ func AdminError(msg string) templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		templ_7745c5c3_Ctx = templ.InitializeContext(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var51 := templ.GetChildren(templ_7745c5c3_Ctx)
-		if templ_7745c5c3_Var51 == nil {
-			templ_7745c5c3_Var51 = templ.NopComponent
+		templ_7745c5c3_Var60 := templ.GetChildren(templ_7745c5c3_Ctx)
+		if templ_7745c5c3_Var60 == nil {
+			templ_7745c5c3_Var60 = templ.NopComponent
 		}
 		templ_7745c5c3_Ctx = templ.ClearChildren(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var52 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var61 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 			if !templ_7745c5c3_IsBuffer {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			var templ_7745c5c3_Var53 string = msg
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
+			var templ_7745c5c3_Var62 string = msg
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var62))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -765,7 +846,7 @@ func AdminError(msg string) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = adminModalMessage("Fehler", true).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var52), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = adminModalMessage("Fehler", true).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var61), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -784,12 +865,12 @@ func AdminModalEmpty() templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		templ_7745c5c3_Ctx = templ.InitializeContext(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var54 := templ.GetChildren(templ_7745c5c3_Ctx)
-		if templ_7745c5c3_Var54 == nil {
-			templ_7745c5c3_Var54 = templ.NopComponent
+		templ_7745c5c3_Var63 := templ.GetChildren(templ_7745c5c3_Ctx)
+		if templ_7745c5c3_Var63 == nil {
+			templ_7745c5c3_Var63 = templ.NopComponent
 		}
 		templ_7745c5c3_Ctx = templ.ClearChildren(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var55 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var64 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 			if !templ_7745c5c3_IsBuffer {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
@@ -800,7 +881,7 @@ func AdminModalEmpty() templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = adminModalMessage("Hinweis", false).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var55), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = adminModalMessage("Hinweis", false).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var64), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -819,17 +900,17 @@ func adminModalInner(title string) templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		templ_7745c5c3_Ctx = templ.InitializeContext(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var56 := templ.GetChildren(templ_7745c5c3_Ctx)
-		if templ_7745c5c3_Var56 == nil {
-			templ_7745c5c3_Var56 = templ.NopComponent
+		templ_7745c5c3_Var65 := templ.GetChildren(templ_7745c5c3_Ctx)
+		if templ_7745c5c3_Var65 == nil {
+			templ_7745c5c3_Var65 = templ.NopComponent
 		}
 		templ_7745c5c3_Ctx = templ.ClearChildren(templ_7745c5c3_Ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header class=\"modal-card-head\"><p id=\"modal-title\" class=\"modal-card-title\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var57 string = title
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var57))
+		var templ_7745c5c3_Var66 string = title
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var66))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -845,7 +926,7 @@ func adminModalInner(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templ_7745c5c3_Var56.Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var65.Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -868,9 +949,9 @@ func adminModalOuter(active bool) templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		templ_7745c5c3_Ctx = templ.InitializeContext(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var58 := templ.GetChildren(templ_7745c5c3_Ctx)
-		if templ_7745c5c3_Var58 == nil {
-			templ_7745c5c3_Var58 = templ.NopComponent
+		templ_7745c5c3_Var67 := templ.GetChildren(templ_7745c5c3_Ctx)
+		if templ_7745c5c3_Var67 == nil {
+			templ_7745c5c3_Var67 = templ.NopComponent
 		}
 		templ_7745c5c3_Ctx = templ.ClearChildren(templ_7745c5c3_Ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"admin-modal\" hx-swap-oob=\"true\"")
@@ -892,7 +973,7 @@ func adminModalOuter(active bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templ_7745c5c3_Var58.Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var67.Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -915,12 +996,12 @@ func adminModalMessage(title string, show bool) templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		templ_7745c5c3_Ctx = templ.InitializeContext(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var59 := templ.GetChildren(templ_7745c5c3_Ctx)
-		if templ_7745c5c3_Var59 == nil {
-			templ_7745c5c3_Var59 = templ.NopComponent
+		templ_7745c5c3_Var68 := templ.GetChildren(templ_7745c5c3_Ctx)
+		if templ_7745c5c3_Var68 == nil {
+			templ_7745c5c3_Var68 = templ.NopComponent
 		}
 		templ_7745c5c3_Ctx = templ.ClearChildren(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var60 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var69 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 			if !templ_7745c5c3_IsBuffer {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
@@ -930,7 +1011,7 @@ func adminModalMessage(title string, show bool) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var61 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_Var70 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 				if !templ_7745c5c3_IsBuffer {
 					templ_7745c5c3_Buffer = templ.GetBuffer()
@@ -940,7 +1021,7 @@ func adminModalMessage(title string, show bool) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templ_7745c5c3_Var59.Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = templ_7745c5c3_Var68.Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -953,7 +1034,7 @@ func adminModalMessage(title string, show bool) templ.Component {
 				}
 				return templ_7745c5c3_Err
 			})
-			templ_7745c5c3_Err = adminModalInner(title).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var61), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = adminModalInner(title).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var70), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -969,8 +1050,8 @@ func adminModalMessage(title string, show bool) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var62 := `Ok`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var62)
+			templ_7745c5c3_Var71 := `Ok`
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var71)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -983,7 +1064,7 @@ func adminModalMessage(title string, show bool) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = adminModalOuter(show).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var60), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = adminModalOuter(show).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var69), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1002,12 +1083,12 @@ func adminModalForm(title string, submitURL string) templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		templ_7745c5c3_Ctx = templ.InitializeContext(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var63 := templ.GetChildren(templ_7745c5c3_Ctx)
-		if templ_7745c5c3_Var63 == nil {
-			templ_7745c5c3_Var63 = templ.NopComponent
+		templ_7745c5c3_Var72 := templ.GetChildren(templ_7745c5c3_Ctx)
+		if templ_7745c5c3_Var72 == nil {
+			templ_7745c5c3_Var72 = templ.NopComponent
 		}
 		templ_7745c5c3_Ctx = templ.ClearChildren(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var64 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var73 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 			if !templ_7745c5c3_IsBuffer {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
@@ -1025,13 +1106,13 @@ func adminModalForm(title string, submitURL string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var65 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_Var74 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 				if !templ_7745c5c3_IsBuffer {
 					templ_7745c5c3_Buffer = templ.GetBuffer()
 					defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 				}
-				templ_7745c5c3_Err = templ_7745c5c3_Var63.Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = templ_7745c5c3_Var72.Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1040,7 +1121,7 @@ func adminModalForm(title string, submitURL string) templ.Component {
 				}
 				return templ_7745c5c3_Err
 			})
-			templ_7745c5c3_Err = adminModalInner(title).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var65), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = adminModalInner(title).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var74), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1048,8 +1129,8 @@ func adminModalForm(title string, submitURL string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var66 := `Speichern`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var66)
+			templ_7745c5c3_Var75 := `Speichern`
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var75)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1065,8 +1146,8 @@ func adminModalForm(title string, submitURL string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var67 := `Abbrechen`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var67)
+			templ_7745c5c3_Var76 := `Abbrechen`
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var76)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1079,7 +1160,7 @@ func adminModalForm(title string, submitURL string) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = adminModalOuter(true).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var64), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = adminModalOuter(true).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var73), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1102,12 +1183,12 @@ func AdminLogin(err string) templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		templ_7745c5c3_Ctx = templ.InitializeContext(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var68 := templ.GetChildren(templ_7745c5c3_Ctx)
-		if templ_7745c5c3_Var68 == nil {
-			templ_7745c5c3_Var68 = templ.NopComponent
+		templ_7745c5c3_Var77 := templ.GetChildren(templ_7745c5c3_Ctx)
+		if templ_7745c5c3_Var77 == nil {
+			templ_7745c5c3_Var77 = templ.NopComponent
 		}
 		templ_7745c5c3_Ctx = templ.ClearChildren(templ_7745c5c3_Ctx)
-		templ_7745c5c3_Var69 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var78 := templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 			if !templ_7745c5c3_IsBuffer {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
@@ -1117,8 +1198,8 @@ func AdminLogin(err string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var70 := `Admin Login`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var70)
+			templ_7745c5c3_Var79 := `Admin Login`
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var79)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1126,8 +1207,8 @@ func AdminLogin(err string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var71 := `Passwort:`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var71)
+			templ_7745c5c3_Var80 := `Passwort:`
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var80)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1140,8 +1221,8 @@ func AdminLogin(err string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var72 string = err
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var72))
+				var templ_7745c5c3_Var81 string = err
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var81))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1154,8 +1235,8 @@ func AdminLogin(err string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var73 := `Anmelden`
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var73)
+			templ_7745c5c3_Var82 := `Anmelden`
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var82)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1168,7 +1249,7 @@ func AdminLogin(err string) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = layout("Admin", false).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var69), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layout("Admin", false).Render(templ.WithChildren(templ_7745c5c3_Ctx, templ_7745c5c3_Var78), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1233,4 +1314,14 @@ func gebotCount(bieter []model.Bieter) string {
 		}
 	}
 	return strconv.Itoa(gebotCount)
+}
+
+func countVerteilstelle(bieter []model.Bieter, verteilstelle model.Verteilstelle) string {
+	var count int
+	for _, b := range bieter {
+		if b.Verteilstelle == verteilstelle {
+			count += 1
+		}
+	}
+	return strconv.Itoa(count)
 }
