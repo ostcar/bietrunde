@@ -2,7 +2,7 @@ package template
 
 templ layout(name string, showLogout bool) {
 	<!DOCTYPE html>
-	<html lang="de">
+	<html lang="de" class="theme-light">
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -10,16 +10,14 @@ templ layout(name string, showLogout bool) {
 			<link rel="icon" href="data:,"/>
 			<link
  				rel="stylesheet"
- 				href="/assets/bulma-0.9.4/bulma/css/bulma.min.css"
- 				integrity="sha384-HmYpsz2Aa9Gh3JlkCoh8kUJ2mUKJKTnkyC2Lzt8aLzpPOpnDe8KpFE2xNiBpMDou"
+ 				href="/assets/bulma.min.css"
 			/>
 			<link
  				rel="stylesheet"
  				href="/assets/style.css"
 			/>
 			<script src="/assets/htmx.min.js"></script>
-			<script src="/assets/htmx-ext-sse.js"></script>
-			<script src="/assets/hyperscript.js"></script>
+			<script src="/assets/htmx-ext-sse.js" type="module"></script>
 		</head>
 		<body>
 			<nav class="navbar" role="navigation">
