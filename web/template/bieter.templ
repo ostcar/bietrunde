@@ -21,6 +21,10 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 			<dd class={ classes("ml-5", errClass(invalidFields["adresse"])) }>
 				@ddmultilineString(bieter.Adresse)
 			</dd>
+			<dt class="has-text-weight-bold">Telefonnummer:</dt>
+			<dd class={ classes("ml-5", errClass(invalidFields["telefon"])) }>
+				@ddString(bieter.Telefon)
+			</dd>
 			<dt class="has-text-weight-bold">Mitglied:</dt>
 			<dd class={ classes("ml-5", errClass(invalidFields["mitglied"])) }>
 				@jaNein(bieter.Mitglied)
@@ -29,9 +33,9 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 			<dd class={ classes("ml-5", errClass(invalidFields["verteilstelle"])) }>
 				@ddString(bieter.Verteilstelle.String())
 			</dd>
-			<dt class="has-text-weight-bold">Teilpartner:</dt>
+			<dt class="has-text-weight-bold">Anteil:</dt>
 			<dd class="ml-5">
-				@ddString( bieter.Teilpartner)
+				@anteilString( bieter.GanzOderHalb, bieter.Teilpartner)
 			</dd>
 			<dt class="has-text-weight-bold">IBAN:</dt>
 			<dd class={ classes("ml-5", errClass(invalidFields["iban"])) }>
@@ -109,7 +113,7 @@ templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
 				if bieter.Gebot != 0 {
 					<p>Bitte trage dein monatliches Gebot von <strong>{ bieter.Gebot.String() }</strong> oben in den <a href="/vertrag" target="_blank">Vertrag</a> ein.</p>
 					<p>
-						Bitte trage dein 
+						Bitte trage dein
 						if bieter.Jaehrlich {
 							Jahresgebot von <strong>{ (bieter.Gebot * 12).String() }</strong>
 						} else {
@@ -159,6 +163,26 @@ templ ddString(s string) {
 		-
 	} else {
 		{ s }
+	}
+}
+
+templ anteilString(ganzOderHalb model.GanzOderHalb, teilpartner string) {
+	switch ganzOderHalb {
+	case model.GanzerAnteil:
+		Ganzer Anteil
+	case model.HalberAnteilSuche:
+		Halber Anteil (brauche noch einen Teilpartner)
+	case model.HalberAnteil:
+		Halber Anteil
+		if teilpartner == "" {
+			(Teilpartner wird nachgereicht)
+		} else {
+			mit { teilpartner }
+		}
+	case model.HalberAnteilMoeglich:
+		Ganzer Anteil (Wäre auch zum Teilen eines Anteils bereit)
+	default:
+		-
 	}
 }
 

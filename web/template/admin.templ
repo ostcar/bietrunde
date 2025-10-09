@@ -69,7 +69,7 @@ templ AdminUserTable(bieter []model.Bieter) {
 					<th title="Anwesend">🐤</th>
 					<th>Bietnummer</th>
 					<th>Name</th>
-					<th>Teilpartner</th>
+					<th>Anteil</th>
 					<th>Gebot</th>
 					<th></th>
 				</tr>
@@ -115,11 +115,7 @@ templ AdminUserTable(bieter []model.Bieter) {
 						<td><a href={ templ.URL(fmt.Sprintf("/?biet-id=%d", bieter.ID)) }>{ strconv.Itoa(bieter.ID) }</a></td>
 						<td>{ bieter.Name() }</td>
 						<td>
-							if bieter.Teilpartner == "" {
-								-
-							} else {
-								{ maxLength(bieter.Teilpartner, 20) }
-							}
+							@anteilString(bieter.GanzOderHalb, bieter.Teilpartner)
 						</td>
 						<td>
 							if bieter.Gebot.Empty() {
