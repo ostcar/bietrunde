@@ -68,8 +68,10 @@ type Bieter struct {
 	Nachname      string        `json:"nachname"`
 	Mail          string        `json:"mail"`
 	Adresse       string        `json:"adresse"`
+	Telefon       string        `json:"telefon"`
 	Mitglied      bool          `json:"mitglied"`
 	Verteilstelle Verteilstelle `json:"verteilstelle"`
+	GanzOderHalb  GanzOderHalb  `json:"ganz_oder_halb"`
 	Teilpartner   string        `json:"teilpartner"`
 	IBAN          string        `json:"iban"`
 	Kontoinhaber  string        `json:"kontoinhaber"`

@@ -53,6 +53,49 @@ func (v Verteilstelle) ToAttr() string {
 	}
 }
 
+type GanzOderHalb int
+
+const (
+	GanzerAnteil GanzOderHalb = iota
+	HalberAnteilSuche
+	HalberAnteil
+	HalberAnteilMoeglich
+)
+
+func (v GanzOderHalb) String() string {
+	return v.ToAttr()
+}
+
+func GanzOderHalbFromAttr(attr string) GanzOderHalb {
+	switch attr {
+	case "ganz":
+		return GanzerAnteil
+	case "halb-suche":
+		return HalberAnteilSuche
+	case "halb":
+		return HalberAnteil
+	case "halb-moeglich":
+		return HalberAnteilMoeglich
+	default:
+		return GanzerAnteil
+	}
+}
+
+func (v GanzOderHalb) ToAttr() string {
+	switch v {
+	case GanzerAnteil:
+		return "ganz"
+	case HalberAnteilSuche:
+		return "halb-suche"
+	case HalberAnteil:
+		return "halb"
+	case HalberAnteilMoeglich:
+		return "halb-moeglich"
+	default:
+		return "ganz"
+	}
+}
+
 // ServiceState is the state of the service.
 type ServiceState int
 
