@@ -179,7 +179,7 @@ func AdminButtons(state model.ServiceState) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#email-button-container\" hx-swap=\"innerHTML\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#email-button-container\" hx-swap=\"innerHTML\" hx-disabled-elt=\"this\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -188,7 +188,7 @@ func AdminButtons(state model.ServiceState) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</a></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" <span class=\"htmx-indicator\"><span class=\"loader\"></span></span></a></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

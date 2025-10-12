@@ -65,8 +65,12 @@ templ AdminButtons(state model.ServiceState) {
 	                hx-post={"/admin/send_confirmation"}
 					hx-target="#email-button-container"
 	                hx-swap="innerHTML"
+					hx-disabled-elt="this"
 			    >
 	                Sende Bestätigungs-E-Mails
+					<span class="htmx-indicator">
+				        <span class="loader"></span>
+				    </span>
 			    </a>
 			</div>
 		}
