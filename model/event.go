@@ -19,6 +19,8 @@ func GetEvent(eventType string) Event {
 		return &eventBieterUpdate{}
 	case eventBieterDelete{}.Name():
 		return &eventBieterDelete{}
+	case eventAcceptContract{}.Name():
+		return &eventAcceptContract{}
 	case eventStateSet{}.Name():
 		return &eventStateSet{}
 	case eventGebot{}.Name():
@@ -96,6 +98,32 @@ func (e eventBieterDelete) Validate(model Model) error {
 
 func (e eventBieterDelete) Execute(model Model, time time.Time) Model {
 	delete(model.Bieter, e.ID)
+	return model
+}
+
+type eventAcceptContract struct {
+	BieterID int `json:"id"`
+}
+
+func (e eventAcceptContract) Name() string {
+	return "accept-contract"
+}
+
+func (e eventAcceptContract) Validate(model Model) error {
+	if _, ok := model.Bieter[e.BieterID]; !ok {
+		return fmt.Errorf("bieter does not exist")
+	}
+
+	return nil
+}
+
+func (e eventAcceptContract) Execute(model Model, time time.Time) Model {
+	bieter, ok := model.Bieter[e.BieterID]
+	if !ok {
+		return model
+	}
+	bieter.ContractAccepted = true
+	model.Bieter[e.BieterID] = bieter
 	return model
 }
 

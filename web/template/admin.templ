@@ -57,6 +57,18 @@ templ AdminButtons(state model.ServiceState) {
 			>
 				CSV Export
 			</a>
+			<div id="email-button-container">
+				<a
+					class="button is-warning"
+	                href="/admin/send_confirmation"
+	                hx-confirm="Massen E-Mails wirklich senden?"
+	                hx-post={"/admin/send_confirmation"}
+					hx-target="#email-button-container"
+	                hx-swap="innerHTML"
+			    >
+	                Sende Bestätigungs-E-Mails
+			    </a>
+			</div>
 		}
 	</div>
 }
@@ -79,14 +91,16 @@ templ AdminUserTable(bieter []model.Bieter) {
 					<tr
  						if len(bieter.InvalidFields()) != 0 && bieter.CanSelfEdit {
 							class="has-background-danger"
+							title={ getErrorTitleText(bieter) }
 						}
- 						else
- 						if len(bieter.InvalidFields()) != 0 {
+ 						else if len(bieter.InvalidFields()) != 0 || !bieter.ContractAccepted {
 							class="has-background-danger-light"
+							title={ getErrorTitleText(bieter) }
 						}
  						else
  						if bieter.CanSelfEdit {
 							class="has-background-warning-light"
+							title="Nutzer kann sich selbst editieren."
 						}
 					>
 						<td>
@@ -178,6 +192,17 @@ templ AdminUserTable(bieter []model.Bieter) {
 	</div>
 }
 
+func getErrorTitleText(bieter model.Bieter) string {
+	var msg string
+	if !bieter.ContractAccepted {
+		msg = "Vertrag nicht akzeptiert."
+	}
+	if 	len(bieter.InvalidFields()) != 0 {
+		msg = msg + " Fehler bei den Feldern."
+	}
+	return msg
+}
+
 func maxLength(str string, l int) string {
 	if l < 4 {
 		l = 4
@@ -191,6 +216,11 @@ func maxLength(str string, l int) string {
 
 templ AdminBieterEdit(bieter model.Bieter, fieldErrors map[string]string) {
 	@adminModalForm(bieter.Name(), "/admin/edit/"+ strconv.Itoa(bieter.ID)) {
+		if !bieter.ContractAccepted {
+			<div class="box">
+				<strong>Der Gemüsevertrag wurde bisher nicht akzeptiert.</strong>
+			</div>
+		}
 		@bieterEditFormFields(bieter, fieldErrors)
 	}
 }

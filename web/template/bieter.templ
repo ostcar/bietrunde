@@ -9,6 +9,7 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 	@layout("Bietrunde - " + bieter.Name(), true) {
 		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
+		@ContractAccept(bieter)
 		<div class="block" hx-ext="sse" sse-connect="/sse" sse-swap="message">
 			@GebotShow(state,bieter, err)
 		</div>
@@ -75,55 +76,62 @@ func classes(class ...string) string {
 }
 
 templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
+	<div class="box">
 	switch state {
 		case model.StateRegistration:
-			<div class="box">
-				if len(bieter.InvalidFields()) == 0 {
-					Bitte drucke vor der Bietrunde den <a href="/vertrag" target="_blank">Vertrag</a> aus und bringe ihn mit!
-				} else {
-					Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
-				}
-			</div>
+			if len(bieter.InvalidFields()) > 0 {
+				Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
+			} else if !bieter.ContractAccepted {
+				Bitte akzeptiere den <a href="/vertrag">Gemüsevertrag</a>.
+			} else {
+				Bitte notiere dir deine Bietnummer. Du brauchst sie wärend der Bietrunde.
+			}
+
 		case model.StateValidation:
-			<div class="box">
-				if len(bieter.InvalidFields()) == 0 {
-					Bitte drucke vor der Bietrunde den <a href="/vertrag" target="_blank">Vertrag</a> aus und bringe ihn mit!
-				} else if bieter.CanSelfEdit {
-					Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
-				} else {
-					Deine Daten sind nicht valide. Bitte setze dich mit dem Vorstand in Verbindung.
-				}
-			</div>
+			if !bieter.ContractAccepted {
+				Bitte akzeptiere den <a href="/vertrag">Gemüsevertrag</a>.
+			} else if len(bieter.InvalidFields()) == 0 {
+				Bitte notiere dir deine Bietnummer. Du brauchst sie wärend der Bietrunde.
+			} else if bieter.CanSelfEdit {
+				Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
+			} else {
+				Deine Daten sind nicht valide. Bitte setze dich mit dem Vorstand in Verbindung.
+			}
+
 		case model.StateOffer:
-			<div class="box">
-				if bieter.Anwesend {
-					<p><strong>Dein monatliches Gebot:</strong> { bieter.Gebot.String() }</p>
-					if state == model.StateOffer {
-						@gebotForm(bieter.Gebot, err)
-					}
-				} else {
-					<p>
-						<strong>Du bist nicht als anwesend registriert.</strong> Bitte melde dich beim Vorstand.
-					</p>
+			if !bieter.ContractAccepted {
+				Bitte akzeptiere den <a href="/vertrag">Gemüsevertrag</a>.
+			} else if bieter.Anwesend {
+				<p><strong>Dein monatliches Gebot:</strong> { bieter.Gebot.String() }</p>
+				if state == model.StateOffer {
+					@gebotForm(bieter.Gebot, err)
 				}
-			</div>
+			} else {
+				<p>
+					<strong>Du bist nicht als anwesend registriert.</strong> Bitte melde dich beim Vorstand.
+				</p>
+			}
+
 		case model.StateFinish:
-			<div class="box">
-				<p>Die Bietrunde ist abgeschlossen.</p>
-				if bieter.Gebot != 0 {
-					<p>Bitte trage dein monatliches Gebot von <strong>{ bieter.Gebot.String() }</strong> oben in den <a href="/vertrag" target="_blank">Vertrag</a> ein.</p>
-					<p>
-						Bitte trage dein
-						if bieter.Jaehrlich {
-							Jahresgebot von <strong>{ (bieter.Gebot * 12).String() }</strong>
-						} else {
-							Monatsgebot von <strong>{ bieter.Gebot.String() } </strong>
-						}
-						unten in das SEPA-Lastschriftmandat ein.
-					</p>
-				}
-			</div>
-	}
+			<p>Die Bietrunde ist abgeschlossen.</p>
+			if bieter.Gebot != 0 {
+				<p>
+					Du wirst eine Bestätigungs-E-Mail mit deinem Gebot erhalten.
+					Solltest du in den nächsten Tagen keine E-Mail erhlaten, dann melde dich bitte beim Vorstand.
+				</p>
+			}
+		}
+	</div>
+}
+
+templ ContractAccept(bieter model.Bieter) {
+	<div id="contract_accept" class="box">
+		if bieter.ContractAccepted {
+			<p><span style="color: #48c774;">✓</span> Du hast den <a href="/vertrag">Gemüsevertrag</a> akzeptiert.</p>
+		} else {
+			<p><span style="color: red;">❌</span> Der <a href="/vertrag">Gemüsevertrag</a> muss akzeptiert werden.</p>
+		}
+	</div>
 }
 
 templ gebotForm(gebot model.Gebot, err string) {
