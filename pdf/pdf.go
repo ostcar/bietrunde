@@ -69,21 +69,21 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 
 		// Vertragstext
 		text.NewRow(10, fmt.Sprintf(`
-			Ich, %s (E-Mail: %s ), bin Mitglied im des Vereins Solidarische Landwirtschaft Baarfood e.V. 
+			Ich, %s (E-Mail: %s ), bin Mitglied im des Vereins Solidarische Landwirtschaft Baarfood e.V.
 			und möchte im Gemüsejahr 2026/2027 (April 2026 – März 2027) einen Gemüseanteil beziehen.`,
 			bieter.Name(), bieter.Mail),
 		),
 		text.NewRow(35,
-			`Der Gemüsevertrag gilt im oben genannten Zeitraum, daher für 12 Monate. 
-			Ich werde mein Gemüse wöchentlich an einer vorher festgelegten Verteilstelle abholen. 
-			Ich respektiere die in den Verteilstellen genannten Anteilsmengen und Abholfristen. 
-			Ich habe keinen Anspruch auf eine bestimmte Menge und Qualität der Produkte. 
-			Sollte es mir vorübergehend nicht möglich sein, meinen Pflichten (Abholung) nachzukommen, 
-			so sorge ich selbst in diesem Zeitraum für einen Ersatz. Im Falle einer Urlaubsvertretung weise 
-			ich persönlich in die Abholmodalitäten ein. 
-			Die endgültige Abgabe meines Anteils im laufenden Jahr ist nur möglich, wenn ein anderes 
-			Vereinsmitglied, das bisher keinen Ernteanteil bezieht oder ein neues Mitglied, den 
-			oben genannten monatlichen finanziellen Beitrag für die verbleibenden Monate übernimmt. 
+			`Der Gemüsevertrag gilt im oben genannten Zeitraum, daher für 12 Monate.
+			Ich werde mein Gemüse wöchentlich an einer vorher festgelegten Verteilstelle abholen.
+			Ich respektiere die in den Verteilstellen genannten Anteilsmengen und Abholfristen.
+			Ich habe keinen Anspruch auf eine bestimmte Menge und Qualität der Produkte.
+			Sollte es mir vorübergehend nicht möglich sein, meinen Pflichten (Abholung) nachzukommen,
+			so sorge ich selbst in diesem Zeitraum für einen Ersatz. Im Falle einer Urlaubsvertretung weise
+			ich persönlich in die Abholmodalitäten ein.
+			Die endgültige Abgabe meines Anteils im laufenden Jahr ist nur möglich, wenn ein anderes
+			Vereinsmitglied, das bisher keinen Ernteanteil bezieht oder ein neues Mitglied, den
+			oben genannten monatlichen finanziellen Beitrag für die verbleibenden Monate übernimmt.
 			Erst ab Abschluss des neuen Gemüsevertrages erfolgt der Lastschrifteinzug von diesem neuen Mitglied.`,
 		),
 		text.NewRow(abstandBetrag,
@@ -119,13 +119,13 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 			Top:   5,
 		}),
 		text.NewRow(5, `Gläubiger-Identifikationsnummer: DE62ZZZ00001997635`),
-		text.NewRow(5, fmt.Sprintf(`Mandatsreferenz: 24%d`, bieter.ID)),
+		text.NewRow(5, fmt.Sprintf(`Mandatsreferenz: 25%d`, bieter.ID)),
 		text.NewRow(abstandBetrag, abbuchungText),
 		text.NewRow(abstandBetrag, fmt.Sprintf("Der Betrag lautet: %s", abbuchungBetrag), props.Text{Style: fontstyle.Bold}),
 		text.NewRow(15,
-			`Ich ermächtige den Verein Solidarische Landwirtschaft Baarfood e.V. 
-			Lastschriften von meinem Konto einzuziehen. Zugleich weise ich mein 
-			Kreditinstitut an, die von Solidarische Landwirtschaft Baarfood e.V. 
+			`Ich ermächtige den Verein Solidarische Landwirtschaft Baarfood e.V.
+			Lastschriften von meinem Konto einzuziehen. Zugleich weise ich mein
+			Kreditinstitut an, die von Solidarische Landwirtschaft Baarfood e.V.
 			auf mein Konto gezogenen Lastschriften einzulösen.`,
 		),
 		text.NewRow(10,
