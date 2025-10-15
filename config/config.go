@@ -16,9 +16,6 @@ type Config struct {
 	AdminToken    string `toml:"admin_token"`
 	Secret        string `toml:"secret"`
 	BaseURL       string `toml:"base_url"`
-	Debug         bool   `toml:"debug"`
-	MailFrom      string `toml:"mail_from"`
-	MailVorstand  string `toml:"mail_vorstand"`
 }
 
 // defaultConfig returns a config object with default values.
@@ -28,9 +25,6 @@ func defaultConfig() Config {
 		AdminToken:    CreatePassword(8),
 		Secret:        CreatePassword(32),
 		BaseURL:       "http://localhost",
-		Debug:         true,
-		MailFrom:      "mail@example.com",
-		MailVorstand:  "vorstand@example.com",
 	}
 }
 

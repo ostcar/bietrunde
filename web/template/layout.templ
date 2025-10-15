@@ -1,12 +1,12 @@
 package template
 
-templ layout(title string, showLogout bool) {
+templ layout(name string, showLogout bool) {
 	<!DOCTYPE html>
 	<html lang="de" class="theme-light">
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<title>{ title }</title>
+			<title>{ name }</title>
 			<link rel="icon" href="data:,"/>
 			<link
  				rel="stylesheet"

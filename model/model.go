@@ -63,23 +63,20 @@ func (g Gebot) Empty() bool {
 
 // Bieter is a person that makes an offer.
 type Bieter struct {
-	ID               int           `json:"id"`
-	Vorname          string        `json:"vorname"`
-	Nachname         string        `json:"nachname"`
-	Mail             string        `json:"mail"`
-	Adresse          string        `json:"adresse"`
-	Telefon          string        `json:"telefon"`
-	Mitglied         bool          `json:"mitglied"`
-	Verteilstelle    Verteilstelle `json:"verteilstelle"`
-	GanzOderHalb     GanzOderHalb  `json:"ganz_oder_halb"`
-	Teilpartner      string        `json:"teilpartner"`
-	IBAN             string        `json:"iban"`
-	Kontoinhaber     string        `json:"kontoinhaber"`
-	Jaehrlich        bool          `json:"jaehrlich"`
-	Gebot            Gebot         `json:"gebot"`
-	Anwesend         bool          `json:"anwesend"`
-	CanSelfEdit      bool          `json:"can_edit"`
-	ContractAccepted bool          `json:"contract_accepted"`
+	ID            int           `json:"id"`
+	Vorname       string        `json:"vorname"`
+	Nachname      string        `json:"nachname"`
+	Mail          string        `json:"mail"`
+	Adresse       string        `json:"adresse"`
+	Mitglied      bool          `json:"mitglied"`
+	Verteilstelle Verteilstelle `json:"verteilstelle"`
+	Teilpartner   string        `json:"teilpartner"`
+	IBAN          string        `json:"iban"`
+	Kontoinhaber  string        `json:"kontoinhaber"`
+	Jaehrlich     bool          `json:"jaehrlich"`
+	Gebot         Gebot         `json:"gebot"`
+	Anwesend      bool          `json:"anwesend"`
+	CanSelfEdit   bool          `json:"can_edit"`
 }
 
 // Name returns the full name.
@@ -248,11 +245,6 @@ func (m Model) BieterUpdate(bieter Bieter) Event {
 // BieterDelete deletes a bieter.
 func (m Model) BieterDelete(id int) Event {
 	return eventBieterDelete{ID: id}
-}
-
-// BieterAcceptContract accepts a contract for a bieter.
-func (m Model) BieterAcceptContract(bieterID int) Event {
-	return eventAcceptContract{bieterID}
 }
 
 // SetState sets the service state.

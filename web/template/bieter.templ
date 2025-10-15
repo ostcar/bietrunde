@@ -9,7 +9,6 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 	@layout("Bietrunde - " + bieter.Name(), true) {
 		<h1 class="title is-4">Hallo { bieter.Name() }</h1>
 		<p class="block">Deine Bietnummer ist <strong>{ strconv.Itoa(bieter.ID) }</strong>. Merke sie dir gut. Du brauchst sie für die nächste Anmeldung.</p>
-		@ContractAccept(bieter)
 		<div class="block" hx-ext="sse" sse-connect="/sse" sse-swap="message">
 			@GebotShow(state,bieter, err)
 		</div>
@@ -22,10 +21,6 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 			<dd class={ classes("ml-5", errClass(invalidFields["adresse"])) }>
 				@ddmultilineString(bieter.Adresse)
 			</dd>
-			<dt class="has-text-weight-bold">Telefonnummer:</dt>
-			<dd class={ classes("ml-5", errClass(invalidFields["telefon"])) }>
-				@ddString(bieter.Telefon)
-			</dd>
 			<dt class="has-text-weight-bold">Mitglied:</dt>
 			<dd class={ classes("ml-5", errClass(invalidFields["mitglied"])) }>
 				@jaNein(bieter.Mitglied)
@@ -34,9 +29,9 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 			<dd class={ classes("ml-5", errClass(invalidFields["verteilstelle"])) }>
 				@ddString(bieter.Verteilstelle.String())
 			</dd>
-			<dt class="has-text-weight-bold">Anteil:</dt>
+			<dt class="has-text-weight-bold">Teilpartner:</dt>
 			<dd class="ml-5">
-				@anteilString( bieter.GanzOderHalb, bieter.Teilpartner)
+				@ddString( bieter.Teilpartner)
 			</dd>
 			<dt class="has-text-weight-bold">IBAN:</dt>
 			<dd class={ classes("ml-5", errClass(invalidFields["iban"])) }>
@@ -76,62 +71,55 @@ func classes(class ...string) string {
 }
 
 templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
-	<div class="box">
 	switch state {
 		case model.StateRegistration:
-			if len(bieter.InvalidFields()) > 0 {
-				Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
-			} else if !bieter.ContractAccepted {
-				Bitte akzeptiere den <a href="/vertrag">Gemüsevertrag</a>.
-			} else {
-				Bitte notiere dir deine Bietnummer. Du brauchst sie wärend der Bietrunde.
-			}
-
-		case model.StateValidation:
-			if !bieter.ContractAccepted {
-				Bitte akzeptiere den <a href="/vertrag">Gemüsevertrag</a>.
-			} else if len(bieter.InvalidFields()) == 0 {
-				Bitte notiere dir deine Bietnummer. Du brauchst sie wärend der Bietrunde.
-			} else if bieter.CanSelfEdit {
-				Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
-			} else {
-				Deine Daten sind nicht valide. Bitte setze dich mit dem Vorstand in Verbindung.
-			}
-
-		case model.StateOffer:
-			if !bieter.ContractAccepted {
-				Bitte akzeptiere den <a href="/vertrag">Gemüsevertrag</a>.
-			} else if bieter.Anwesend {
-				<p><strong>Dein monatliches Gebot:</strong> { bieter.Gebot.String() }</p>
-				if state == model.StateOffer {
-					@gebotForm(bieter.Gebot, err)
+			<div class="box">
+				if len(bieter.InvalidFields()) == 0 {
+					Bitte drucke vor der Bietrunde den <a href="/vertrag" target="_blank">Vertrag</a> aus und bringe ihn mit!
+				} else {
+					Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
 				}
-			} else {
-				<p>
-					<strong>Du bist nicht als anwesend registriert.</strong> Bitte melde dich beim Vorstand.
-				</p>
-			}
-
+			</div>
+		case model.StateValidation:
+			<div class="box">
+				if len(bieter.InvalidFields()) == 0 {
+					Bitte drucke vor der Bietrunde den <a href="/vertrag" target="_blank">Vertrag</a> aus und bringe ihn mit!
+				} else if bieter.CanSelfEdit {
+					Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
+				} else {
+					Deine Daten sind nicht valide. Bitte setze dich mit dem Vorstand in Verbindung.
+				}
+			</div>
+		case model.StateOffer:
+			<div class="box">
+				if bieter.Anwesend {
+					<p><strong>Dein monatliches Gebot:</strong> { bieter.Gebot.String() }</p>
+					if state == model.StateOffer {
+						@gebotForm(bieter.Gebot, err)
+					}
+				} else {
+					<p>
+						<strong>Du bist nicht als anwesend registriert.</strong> Bitte melde dich beim Vorstand.
+					</p>
+				}
+			</div>
 		case model.StateFinish:
-			<p>Die Bietrunde ist abgeschlossen.</p>
-			if bieter.Gebot != 0 {
-				<p>
-					Du wirst eine Bestätigungs-E-Mail mit deinem Gebot erhalten.
-					Solltest du in den nächsten Tagen keine E-Mail erhlaten, dann melde dich bitte beim Vorstand.
-				</p>
-			}
-		}
-	</div>
-}
-
-templ ContractAccept(bieter model.Bieter) {
-	<div id="contract_accept" class="box">
-		if bieter.ContractAccepted {
-			<p><span style="color: #48c774;">✓</span> Du hast den <a href="/vertrag">Gemüsevertrag</a> akzeptiert.</p>
-		} else {
-			<p><span style="color: red;">❌</span> Der <a href="/vertrag">Gemüsevertrag</a> muss akzeptiert werden.</p>
-		}
-	</div>
+			<div class="box">
+				<p>Die Bietrunde ist abgeschlossen.</p>
+				if bieter.Gebot != 0 {
+					<p>Bitte trage dein monatliches Gebot von <strong>{ bieter.Gebot.String() }</strong> oben in den <a href="/vertrag" target="_blank">Vertrag</a> ein.</p>
+					<p>
+						Bitte trage dein 
+						if bieter.Jaehrlich {
+							Jahresgebot von <strong>{ (bieter.Gebot * 12).String() }</strong>
+						} else {
+							Monatsgebot von <strong>{ bieter.Gebot.String() } </strong>
+						}
+						unten in das SEPA-Lastschriftmandat ein.
+					</p>
+				}
+			</div>
+	}
 }
 
 templ gebotForm(gebot model.Gebot, err string) {
@@ -171,26 +159,6 @@ templ ddString(s string) {
 		-
 	} else {
 		{ s }
-	}
-}
-
-templ anteilString(ganzOderHalb model.GanzOderHalb, teilpartner string) {
-	switch ganzOderHalb {
-	case model.GanzerAnteil:
-		Ganzer Anteil
-	case model.HalberAnteilSuche:
-		Halber Anteil (brauche noch einen Teilpartner)
-	case model.HalberAnteil:
-		Halber Anteil
-		if teilpartner == "" {
-			(Teilpartner wird nachgereicht)
-		} else {
-			mit { teilpartner }
-		}
-	case model.HalberAnteilMoeglich:
-		Ganzer Anteil (Wäre auch zum Teilen eines Anteils bereit)
-	default:
-		-
 	}
 }
 

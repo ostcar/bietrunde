@@ -29,10 +29,8 @@ templ bieterEditFormFields(bieter model.Bieter, fieldErrors map[string]string) {
 	@formFieldName(bieter.Vorname, bieter.Nachname, fieldErrors["vorname"], fieldErrors["nachname"])
 	@formFieldMail(bieter.Mail, fieldErrors["mail"])
 	@formFieldAdresse(bieter.Adresse, fieldErrors["adresse"])
-	@formFieldTelefon(bieter.Telefon)
 	@formFieldVerteilstelle(bieter.Verteilstelle, fieldErrors["verteilstelle"])
-	@formGanzOderHalb(bieter.GanzOderHalb)
-	@formFieldTeilpartner(bieter.GanzOderHalb, bieter.Teilpartner)
+	@formFieldTeilpartner(bieter.Teilpartner)
 	@formFieldMitglied(bieter.Mitglied, fieldErrors["mitglied"])
 	@formFieldIBAN(bieter.IBAN, fieldErrors["iban"])
 	@formFieldKontoinhaber(bieter.Kontoinhaber)
@@ -84,16 +82,6 @@ templ formFieldAdresse(adresse string, err string) {
 	</div>
 }
 
-templ formFieldTelefon(telefon string) {
-	<div class="field">
-		<label class="label">Telefonnummer</label>
-		<div class="control">
-			<input name="telefon" class="input" type="text" placeholder="07721 ..." value={ telefon }/>
-			<p class="help">Für mögliche Rückfragen</p>
-		</div>
-	</div>
-}
-
 templ formFieldMitglied(mitglied bool, err string) {
 	<div class="field">
 		<label class="label">Mitglied</label>
@@ -128,44 +116,14 @@ templ formFieldVerteilstelle(v model.Verteilstelle, err string) {
 	</div>
 }
 
-templ formGanzOderHalb(v model.GanzOderHalb) {
+templ formFieldTeilpartner(partner string) {
 	<div class="field">
-		<label class="label">Ganzer oder halber Anteil</label>
-		<div class="control">
-			<div class="select">
-				<select	id="ganzOderHalb" name="ganzOderHalb">
-					<option selected?={ v == model.GanzerAnteil } value="ganz">Ganzer Anteil</option>
-					<option selected?={ v == model.HalberAnteilSuche } value="halb-suche">Halber Anteil (brauche noch einen Teilpartner)</option>
-					<option selected?={ v == model.HalberAnteil } value="halb">Halber Anteil</option>
-					<option selected?={ v == model.HalberAnteilMoeglich } value="halb-moeglich">Wäre auch zum Teilen eines Anteils bereit</option>
-				</select>
-			</div>
-		</div>
-	</div>
-}
-
-templ formFieldTeilpartner(ganzOderHalb model.GanzOderHalb, partner string) {
-	<div id="form-field-teilpartner" class="field"
-		if ganzOderHalb != model.HalberAnteil {
-			hidden
-		}
-	>
 		<label class="label">Teilpartner</label>
 		<div class="control">
 			<input name="teilpartner" class="input" type="text" placeholder="Vor- und Nachname" value={ partner }/>
-			<p class="help">Name der anderen Person</p>
+			<p class="help">Falls der Anteil geteilt wird und Teilpartner bekannt: Name der anderen Person</p>
 		</div>
 	</div>
-	<script>
-    document.getElementById('ganzOderHalb').addEventListener('change', function() {
-      const block = document.getElementById('form-field-teilpartner');
-      if (this.value === 'halb') {
-        block.removeAttribute('hidden');
-      } else {
-        block.setAttribute('hidden', '');
-      }
-    });
-  </script>
 }
 
 templ formFieldIBAN(iban string, err string) {
