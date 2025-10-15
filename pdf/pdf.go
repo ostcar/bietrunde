@@ -69,7 +69,7 @@ func Bietervertrag(domain string, bieter model.Bieter) ([]byte, error) {
 
 		// Vertragstext
 		text.NewRow(10, fmt.Sprintf(`
-			Ich, %s (E-Mail: %s ), bin Mitglied im des Vereins Solidarische Landwirtschaft Baarfood e.V.
+			Ich, %s (E-Mail: %s ), bin Mitglied im Verein Solidarische Landwirtschaft Baarfood e.V.
 			und möchte im Gemüsejahr 2026/2027 (April 2026 – März 2027) einen Gemüseanteil beziehen.`,
 			bieter.Name(), bieter.Mail),
 		),
