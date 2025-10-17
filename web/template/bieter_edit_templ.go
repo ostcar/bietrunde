@@ -895,7 +895,7 @@ func formFieldKontoinhaber(inhaber string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Var49 := `Kontoinhaber`
+		templ_7745c5c3_Var49 := `Kontoinhaberin`
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -912,7 +912,7 @@ func formFieldKontoinhaber(inhaber string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Var50 := `Wenn leer wird der Bietername verwendet`
+		templ_7745c5c3_Var50 := `Muss dem exakten Namen des Kontoinhabers entsprechen!`
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var50)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

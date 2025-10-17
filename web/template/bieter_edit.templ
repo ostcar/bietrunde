@@ -182,10 +182,10 @@ templ formFieldIBAN(iban string, err string) {
 
 templ formFieldKontoinhaber(inhaber string) {
 	<div class="field">
-		<label class="label">Kontoinhaber</label>
+		<label class="label">Kontoinhaberin</label>
 		<div class="control">
 			<input name="kontoinhaber" class="input" type="text" placeholder="Vorname Nachname" value={ inhaber }/>
-			<p class="help">Wenn leer wird der Bietername verwendet</p>
+			<p class="help">Muss dem exakten Namen des Kontoinhabers entsprechen!</p>
 		</div>
 	</div>
 }
