@@ -6,10 +6,10 @@ import (
 	"github.com/ostcar/bietrunde/model"
 )
 
-templ Admin(state model.ServiceState, bieter []model.Bieter) {
+templ Admin(state model.ServiceState, bieter []model.Bieter, sort string) {
 	@layout("Admin", true) {
 		<h1 class="title is-3">Admin</h1>
-		@AdminUserTable(bieter)
+		@AdminUserTable(bieter, sort)
 		<div hx-ext="sse" sse-connect="/admin/sse" sse-swap="message">
 			@AdminButtons(state)
 		</div>
@@ -61,21 +61,54 @@ templ AdminButtons(state model.ServiceState) {
 	</div>
 }
 
-templ AdminUserTable(bieter []model.Bieter) {
-	<div id="admin-user-table" hx-get="/admin" hx-trigger="every 2s">
+templ AdminUserTable(bieter []model.Bieter, sort string) {
+	<div id="admin-user-table" hx-get="/admin" hx-trigger="every 2s" hx-headers={ fmt.Sprintf(`{"X-Sort": "%s"}`, sort) }>
 		<table class="table box" style="overflow-x: auto">
 			<thead>
 				<tr>
-					<th title="Anwesend">🐤</th>
+					<th
+						title="Anwesend"
+						hx-get="/admin"
+						hx-headers={ fmt.Sprintf(`{"X-Sort": "%s"}`, model.SortAdd(sort, "anwesend")) }
+						hx-target="#admin-user-table"
+						hx-swap="outerHTML"
+						style="cursor: pointer;"
+					>
+						🐤
+					</th>
 					<th>Bietnummer</th>
-					<th>Name</th>
-					<th>Anteil</th>
-					<th>Gebot</th>
+					<th
+						hx-get="/admin"
+						hx-headers={ fmt.Sprintf(`{"X-Sort": "%s"}`, model.SortAdd(sort, "name")) }
+						hx-target="#admin-user-table"
+						hx-swap="outerHTML"
+						style="cursor: pointer;"
+					>
+						Name
+					</th>
+					<th
+						hx-get="/admin"
+						hx-headers={ fmt.Sprintf(`{"X-Sort": "%s"}`, model.SortAdd(sort, "anteil")) }
+						hx-target="#admin-user-table"
+						hx-swap="outerHTML"
+						style="cursor: pointer;"
+					>
+						Anteil
+					</th>
+					<th
+						hx-get="/admin"
+						hx-headers={ fmt.Sprintf(`{"X-Sort": "%s"}`, model.SortAdd(sort, "gebot")) }
+						hx-target="#admin-user-table"
+						hx-swap="outerHTML"
+						style="cursor: pointer;"
+					>
+						Gebot
+					</th>
 					<th></th>
 				</tr>
 			</thead>
 			<tbody>
-				for _, bieter := range bieter {
+				for _, bieter := range  model.SortBieter(bieter, model.ParseSortAttr(sort)) {
 					<tr
  						if len(bieter.InvalidFields()) != 0 && bieter.CanSelfEdit {
 							class="has-background-danger"

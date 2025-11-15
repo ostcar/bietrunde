@@ -460,30 +460,41 @@ func (s server) adminPage(next func(w http.ResponseWriter, r *http.Request) erro
 	}
 }
 
+func getSort(r *http.Request) string {
+	sort := r.Header.Get("X-Sort")
+	if sort == "" {
+		sort = r.URL.Query().Get("sort")
+	}
+	return sort
+}
+
 func (s server) handleAdmin(w http.ResponseWriter, r *http.Request) error {
 	m, done := s.model.ForReading()
 	defer done()
 
 	bieter := adminBieterList(m)
 
+	sort := getSort(r)
+
 	if r.Header.Get("HX-Request") == "true" {
-		eTag := string(bieterETagValue(bieter))
+		eTag := bieterETagValue(bieter, sort)
 		w.Header().Add("ETag", eTag)
-		w.Header().Add("Vary", "HX-Request")
+		w.Header().Add("Vary", "HX-Request, X-Sort")
 
 		if r.Header.Get("If-None-Match") == eTag {
 			w.WriteHeader(http.StatusNotModified)
 			return nil
 		}
 
-		return template.AdminUserTable(bieter).Render(r.Context(), w)
+		return template.AdminUserTable(bieter, sort).Render(r.Context(), w)
 	}
-	return template.Admin(m.State, bieter).Render(r.Context(), w)
+	return template.Admin(m.State, bieter, sort).Render(r.Context(), w)
 }
 
-func bieterETagValue(bieter []model.Bieter) string {
+func bieterETagValue(bieter []model.Bieter, sort string) string {
 	h := crc32.NewIEEE()
 	fmt.Fprint(h, bieter)
+	fmt.Fprint(h, sort)
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
@@ -521,7 +532,7 @@ func (s server) handleAdminNew(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	bieter := m.Bieter[bieterID]
-	if err := template.AdminUserTable(adminBieterList(m)).Render(r.Context(), w); err != nil {
+	if err := template.AdminUserTable(adminBieterList(m), getSort(r)).Render(r.Context(), w); err != nil {
 		return err
 	}
 
@@ -568,7 +579,7 @@ func (s server) handleAdminEdit(w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 
-		return template.AdminUserTable(adminBieterList(m)).Render(r.Context(), w)
+		return template.AdminUserTable(adminBieterList(m), getSort(r)).Render(r.Context(), w)
 
 	default:
 		http.Error(w, "Fehler", http.StatusMethodNotAllowed)
@@ -591,7 +602,7 @@ func (s server) handleAdminDelete(w http.ResponseWriter, r *http.Request) error 
 	}
 
 	bieter := adminBieterList(m)
-	return template.AdminUserTable(bieter).Render(r.Context(), w)
+	return template.AdminUserTable(bieter, getSort(r)).Render(r.Context(), w)
 }
 
 func (s server) handleAdminAnwesend(w http.ResponseWriter, r *http.Request) error {
@@ -609,7 +620,7 @@ func (s server) handleAdminAnwesend(w http.ResponseWriter, r *http.Request) erro
 	}
 
 	bieter := adminBieterList(m)
-	return template.AdminUserTable(bieter).Render(r.Context(), w)
+	return template.AdminUserTable(bieter, getSort(r)).Render(r.Context(), w)
 }
 
 func (s server) handleAdminSetCanSelfEdit(w http.ResponseWriter, r *http.Request) error {
@@ -627,7 +638,7 @@ func (s server) handleAdminSetCanSelfEdit(w http.ResponseWriter, r *http.Request
 	}
 
 	bieter := adminBieterList(m)
-	return template.AdminUserTable(bieter).Render(r.Context(), w)
+	return template.AdminUserTable(bieter, getSort(r)).Render(r.Context(), w)
 }
 
 func (s server) handleAdminSetCanNotSelfEdit(w http.ResponseWriter, r *http.Request) error {
@@ -645,7 +656,7 @@ func (s server) handleAdminSetCanNotSelfEdit(w http.ResponseWriter, r *http.Requ
 	}
 
 	bieter := adminBieterList(m)
-	return template.AdminUserTable(bieter).Render(r.Context(), w)
+	return template.AdminUserTable(bieter, getSort(r)).Render(r.Context(), w)
 }
 
 func (s server) handleAdminAbwesend(w http.ResponseWriter, r *http.Request) error {
@@ -663,7 +674,7 @@ func (s server) handleAdminAbwesend(w http.ResponseWriter, r *http.Request) erro
 	}
 
 	bieter := adminBieterList(m)
-	return template.AdminUserTable(bieter).Render(r.Context(), w)
+	return template.AdminUserTable(bieter, getSort(r)).Render(r.Context(), w)
 }
 
 func (s server) handleAdminResetGebot(w http.ResponseWriter, r *http.Request) error {
@@ -680,7 +691,7 @@ func (s server) handleAdminResetGebot(w http.ResponseWriter, r *http.Request) er
 	}
 
 	bieter := adminBieterList(m)
-	return template.AdminUserTable(bieter).Render(r.Context(), w)
+	return template.AdminUserTable(bieter, getSort(r)).Render(r.Context(), w)
 }
 
 func (s server) handleAdminState(w http.ResponseWriter, r *http.Request) error {

@@ -1,9 +1,11 @@
 package model
 
 import (
+	"cmp"
 	"fmt"
 	"math/rand"
 	"net/mail"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -272,4 +274,77 @@ func (m Model) BieterSetAnwesend(id int, anwesend bool) Event {
 // BieterSetCanSelfEdit sets the attribute CanSelfEdit.
 func (m Model) BieterSetCanSelfEdit(id int, canEdit bool) Event {
 	return eventSetCanSelfEdit{BietID: id, CanSelfEdit: canEdit}
+}
+
+// ParseSortAttr parses a sort string into a list of attributes.
+func ParseSortAttr(sort string) []string {
+	return strings.Split(sort, ",")
+}
+
+// SortAdd adds an attribute to the sort list.
+func SortAdd(sort string, attr string) string {
+	if sort == "" {
+		return attr
+	}
+
+	parts := ParseSortAttr(sort)
+
+	parts = slices.DeleteFunc(parts, func(part string) bool {
+		return part == attr
+	})
+
+	result := append([]string{attr}, parts...)
+
+	return strings.Join(result, ",")
+}
+
+// SortBieter sorts bieter based on the given sortList.
+func SortBieter(bieter []Bieter, sortList []string) []Bieter {
+	comparators := make([]func(a, b Bieter) int, 0, len(sortList))
+
+	for _, sortKey := range sortList {
+		switch sortKey {
+		case "anwesend":
+			comparators = append(comparators, func(a, b Bieter) int {
+				if a.Anwesend == b.Anwesend {
+					return 0
+				}
+				if a.Anwesend {
+					return 1
+				}
+				return -1
+			})
+		case "name":
+			comparators = append(comparators, func(a, b Bieter) int {
+				return strings.Compare(a.Name(), b.Name())
+			})
+		case "anteil":
+			comparators = append(comparators, func(a, b Bieter) int {
+				if a.GanzOderHalb == HalberAnteil && b.GanzOderHalb == HalberAnteil {
+					return cmp.Compare(a.Teilpartner, b.Teilpartner)
+				}
+				return cmp.Compare(a.GanzOderHalb, b.GanzOderHalb)
+			})
+		case "gebot":
+			comparators = append(comparators, func(a, b Bieter) int {
+				if a.Gebot.Empty() == b.Gebot.Empty() {
+					return 0
+				}
+				if a.Gebot.Empty() {
+					return 1
+				}
+				return -1
+			})
+		}
+	}
+
+	return slices.SortedFunc(slices.Values(bieter), func(a, b Bieter) int {
+		results := make([]int, len(comparators))
+		for i, comp := range comparators {
+			results[i] = comp(a, b)
+		}
+		return cmp.Or(
+			results...,
+		)
+	})
 }

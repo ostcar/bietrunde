@@ -15,7 +15,7 @@ import (
 	"strconv"
 )
 
-func Admin(state model.ServiceState, bieter []model.Bieter) templ.Component {
+func Admin(state model.ServiceState, bieter []model.Bieter, sort string) templ.Component {
 	return templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -47,7 +47,7 @@ func Admin(state model.ServiceState, bieter []model.Bieter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = AdminUserTable(bieter).Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = AdminUserTable(bieter, sort).Render(templ_7745c5c3_Ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -187,7 +187,7 @@ func AdminButtons(state model.ServiceState) templ.Component {
 	})
 }
 
-func AdminUserTable(bieter []model.Bieter) templ.Component {
+func AdminUserTable(bieter []model.Bieter, sort string) templ.Component {
 	return templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -200,7 +200,23 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		templ_7745c5c3_Ctx = templ.ClearChildren(templ_7745c5c3_Ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"admin-user-table\" hx-get=\"/admin\" hx-trigger=\"every 2s\"><table class=\"table box\" style=\"overflow-x: auto\"><thead><tr><th title=\"Anwesend\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"admin-user-table\" hx-get=\"/admin\" hx-trigger=\"every 2s\" hx-headers=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf(`{"X-Sort": "%s"}`, sort)))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><table class=\"table box\" style=\"overflow-x: auto\"><thead><tr><th title=\"Anwesend\" hx-get=\"/admin\" hx-headers=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf(`{"X-Sort": "%s"}`, model.SortAdd(sort, "anwesend"))))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#admin-user-table\" hx-swap=\"outerHTML\" style=\"cursor: pointer;\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -218,7 +234,15 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th hx-get=\"/admin\" hx-headers=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf(`{"X-Sort": "%s"}`, model.SortAdd(sort, "name"))))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#admin-user-table\" hx-swap=\"outerHTML\" style=\"cursor: pointer;\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -227,7 +251,15 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th hx-get=\"/admin\" hx-headers=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf(`{"X-Sort": "%s"}`, model.SortAdd(sort, "anteil"))))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#admin-user-table\" hx-swap=\"outerHTML\" style=\"cursor: pointer;\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -236,7 +268,15 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th hx-get=\"/admin\" hx-headers=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf(`{"X-Sort": "%s"}`, model.SortAdd(sort, "gebot"))))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#admin-user-table\" hx-swap=\"outerHTML\" style=\"cursor: pointer;\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -249,7 +289,7 @@ func AdminUserTable(bieter []model.Bieter) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, bieter := range bieter {
+		for _, bieter := range model.SortBieter(bieter, model.ParseSortAttr(sort)) {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<tr")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

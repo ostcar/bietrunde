@@ -53,8 +53,10 @@ func (v Verteilstelle) ToAttr() string {
 	}
 }
 
+// GanzOderHalb is an enum to tell, if the bieter wants to share his anteil.
 type GanzOderHalb int
 
+// These are the enum values for GanzOderHalb.
 const (
 	GanzerAnteil GanzOderHalb = iota
 	HalberAnteilSuche
@@ -66,6 +68,8 @@ func (v GanzOderHalb) String() string {
 	return v.ToAttr()
 }
 
+// GanzOderHalbFromAttr converts a attribute string representation to
+// GanzOderHalb.
 func GanzOderHalbFromAttr(attr string) GanzOderHalb {
 	switch attr {
 	case "ganz":
@@ -81,6 +85,7 @@ func GanzOderHalbFromAttr(attr string) GanzOderHalb {
 	}
 }
 
+// ToAttr converts a GanzOderHalb enum value to a string representation.
 func (v GanzOderHalb) ToAttr() string {
 	switch v {
 	case GanzerAnteil:
