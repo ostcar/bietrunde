@@ -325,6 +325,11 @@ func SortBieter(bieter []Bieter, sortList []string) []Bieter {
 				}
 				return cmp.Compare(a.GanzOderHalb, b.GanzOderHalb)
 			})
+		case "verteilstelle":
+			comparators = append(comparators, func(a, b Bieter) int {
+				return strings.Compare(a.Verteilstelle.String(), b.Verteilstelle.String())
+			})
+
 		case "gebot":
 			comparators = append(comparators, func(a, b Bieter) int {
 				if a.Gebot.Empty() == b.Gebot.Empty() {

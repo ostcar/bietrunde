@@ -97,6 +97,15 @@ templ AdminUserTable(bieter []model.Bieter, sort string) {
 					</th>
 					<th
 						hx-get="/admin"
+						hx-headers={ fmt.Sprintf(`{"X-Sort": "%s"}`, model.SortAdd(sort, "verteilstelle")) }
+						hx-target="#admin-user-table"
+						hx-swap="outerHTML"
+						style="cursor: pointer;"
+					>
+						Verteilstelle
+					</th>
+					<th
+						hx-get="/admin"
 						hx-headers={ fmt.Sprintf(`{"X-Sort": "%s"}`, model.SortAdd(sort, "gebot")) }
 						hx-target="#admin-user-table"
 						hx-swap="outerHTML"
@@ -149,6 +158,9 @@ templ AdminUserTable(bieter []model.Bieter, sort string) {
 						<td>{ bieter.Name() }</td>
 						<td>
 							@anteilString(bieter.GanzOderHalb, bieter.Teilpartner)
+						</td>
+						<td>
+							{ bieter.Verteilstelle.String() }
 						</td>
 						<td>
 							if bieter.Gebot.Empty() {
