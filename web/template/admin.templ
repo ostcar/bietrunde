@@ -254,7 +254,7 @@ templ AdminModalEmpty() {
 templ adminModalInner(title string, ) {
 	<header class="modal-card-head">
 		<p id="modal-title" class="modal-card-title">{ title }</p>
-		<button class="delete" aria-label="close" _={ adminModalClose() }></button>
+		<button type="button" class="delete" aria-label="close" onclick={ adminModalClose() }></button>
 	</header>
 	<section class="modal-card-body">
 		{ children... }
@@ -288,7 +288,7 @@ templ adminModalMessage(title string, show bool) {
 				<button
  					class="button"
  					type="button"
- 					_={ adminModalClose() }
+ 					onclick={ adminModalClose() }
 				>
 					Ok
 				</button>
@@ -313,7 +313,7 @@ templ adminModalForm(title string, submitURL string) {
 					<button
  						class="button"
  						type="button"
- 						_={ adminModalClose() }
+ 						onclick={ adminModalClose() }
 					>
 						Abbrechen
 					</button>
@@ -323,8 +323,8 @@ templ adminModalForm(title string, submitURL string) {
 	}
 }
 
-func adminModalClose() string {
-	return `on click remove .is-active from #admin-modal`
+script adminModalClose() {
+	document.getElementById('admin-modal').classList.remove('is-active');
 }
 
 templ AdminLogin(err string) {
