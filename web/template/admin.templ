@@ -334,7 +334,7 @@ templ AdminLogin(err string) {
 			<div class="field">
 				<label class="label">Passwort:</label>
 				<div class="control">
-					<input name="password" class="input" type="password" _="on load call me.focus()"/>
+					<input id="password-input" name="password" class="input" type="password" autofocus/>
 				</div>
 			</div>
 			if err != "" {
