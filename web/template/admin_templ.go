@@ -162,11 +162,11 @@ func AdminButtons(state model.ServiceState) templ.Component {
 			}
 		}
 		if state == model.StateFinish {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"button is-warning\" href=\"/admin/csv\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a class=\"button is-warning\" href=\"/admin/zip\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var8 := `CSV Export`
+			templ_7745c5c3_Var8 := `Export`
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

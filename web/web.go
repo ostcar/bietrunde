@@ -1,6 +1,7 @@
 package web
 
 import (
+	"archive/zip"
 	"cmp"
 	"context"
 	"embed"
@@ -101,7 +102,7 @@ func (s *server) registerHandlers() {
 	router.Handle("/admin/can_not_self_edit/{id:[0-9]+}", handleError(s.adminPage(s.handleAdminSetCanNotSelfEdit)))
 	router.Handle("/admin/state", handleError(s.adminPage(s.handleAdminState)))
 	router.Handle("/admin/reset-gebot", handleError(s.adminPage(s.handleAdminResetGebot)))
-	router.Handle("/admin/csv", handleError(s.adminPage(s.handleAdminCSV)))
+	router.Handle("/admin/zip", handleError(s.adminPage(s.handleAdminZIP)))
 	router.Handle("/admin/sse", handleError(s.adminPage(s.handleAdminSSE)))
 
 	s.Handler = loggingMiddleware(router)
@@ -714,22 +715,55 @@ func (s server) handleAdminState(w http.ResponseWriter, r *http.Request) error {
 	return template.AdminButtons(state).Render(r.Context(), w)
 }
 
-func (s server) handleAdminCSV(w http.ResponseWriter, r *http.Request) error {
-	w.Header().Add("Content-Type", "text/csv")
-	w.Header().Add("Content-Disposition", `attachment; filename="bieter.csv`)
+func (s server) handleAdminZIP(w http.ResponseWriter, _ *http.Request) error {
+	w.Header().Add("Content-Type", "application/zip")
+	w.Header().Add("Content-Disposition", `attachment; filename="bieter.zip"`)
+
 	m, done := s.model.ForReading()
 	defer done()
 
-	csvW := csv.NewWriter(w)
-	if err := csvW.Write(model.BieterCSVHeader()); err != nil {
-		return err
-	}
+	zipW := zip.NewWriter(w)
+	defer zipW.Close()
+
+	var jaehrlich, monatlich []model.Bieter
 	for _, bieter := range m.Bieter {
-		if err := csvW.Write(bieter.CSVRecord()); err != nil {
-			return err
+		if bieter.Jaehrlich {
+			jaehrlich = append(jaehrlich, bieter)
+			continue
+		}
+		monatlich = append(monatlich, bieter)
+	}
+
+	if err := writeCSVToZip(zipW, "bieter_jaehrlich.csv", jaehrlich, true); err != nil {
+		return fmt.Errorf("write bieter_jaehrlich.csv: %w", err)
+	}
+
+	if err := writeCSVToZip(zipW, "bieter_monatlich.csv", monatlich, false); err != nil {
+		return fmt.Errorf("write bieter_monatlich.csv: %w", err)
+	}
+
+	return nil
+}
+
+func writeCSVToZip(zipW *zip.Writer, filename string, bieter []model.Bieter, jaehrlich bool) error {
+	fileW, err := zipW.Create(filename)
+	if err != nil {
+		return fmt.Errorf("create csv file: %w", err)
+	}
+
+	csvW := csv.NewWriter(fileW)
+	defer csvW.Flush()
+
+	if err := csvW.Write(model.BieterCSVHeader()); err != nil {
+		return fmt.Errorf("create csv header: %w", err)
+	}
+
+	for _, b := range bieter {
+		if err := csvW.Write(b.CSVRecord(jaehrlich)); err != nil {
+			return fmt.Errorf("write csv record for %s: %w", b.Name(), err)
 		}
 	}
-	csvW.Flush()
+
 	return nil
 }
 

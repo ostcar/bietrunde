@@ -154,13 +154,12 @@ func BieterCSVHeader() []string {
 		"iban",
 		"kontoinhaber",
 		"abbuchung",
-		"gebot-monat",
-		"gebot-jaehrlich",
+		"gebot",
 	}
 }
 
 // CSVRecord returns the bieter as csv record
-func (b Bieter) CSVRecord() []string {
+func (b Bieter) CSVRecord(jaehrlich bool) []string {
 	mitglied := "Nein"
 	if b.Mitglied {
 		mitglied = "Ja"
@@ -169,14 +168,13 @@ func (b Bieter) CSVRecord() []string {
 	if b.Jaehrlich {
 		abbuchung = "jährlich"
 	}
-	gebotMonat := ""
-	if !b.Gebot.Empty() && !b.Jaehrlich {
-		gebotMonat = b.Gebot.String()
-	}
-
-	gebotJahr := ""
-	if !b.Gebot.Empty() && b.Jaehrlich {
-		gebotJahr = (b.Gebot * 12).String()
+	gebot := ""
+	if !b.Gebot.Empty() {
+		if b.Jaehrlich {
+			gebot = (b.Gebot * 12).String()
+		} else {
+			gebot = b.Gebot.String()
+		}
 	}
 
 	return []string{
@@ -191,8 +189,7 @@ func (b Bieter) CSVRecord() []string {
 		b.IBAN,
 		b.ShowKontoinhaber(),
 		abbuchung,
-		gebotMonat,
-		gebotJahr,
+		gebot,
 	}
 }
 
