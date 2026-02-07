@@ -63,6 +63,11 @@ func (g Gebot) Empty() bool {
 	return int(g) == 0
 }
 
+// ForYear returns the offer for a year.
+func (g Gebot) ForYear() Gebot {
+	return g * 12
+}
+
 // Bieter is a person that makes an offer.
 type Bieter struct {
 	ID            int           `json:"id"`
@@ -96,7 +101,10 @@ func (b Bieter) ShowKontoinhaber() string {
 	if b.Kontoinhaber != "" {
 		return b.Kontoinhaber
 	}
-	return b.Name()
+	if len(b.Vorname)+len(b.Nachname) == 0 {
+		return "KEIN NAME ANGEGEBEN"
+	}
+	return b.Nachname + " " + b.Vorname
 }
 
 // InvalidFields returns a map from invalid fields to an error message.

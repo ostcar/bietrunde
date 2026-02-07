@@ -725,8 +725,9 @@ func (s server) handleAdminZIP(w http.ResponseWriter, _ *http.Request) error {
 	zipW := zip.NewWriter(w)
 	defer zipW.Close()
 
-	var jaehrlich, monatlich []model.Bieter
+	var jaehrlich, monatlich, allBieter []model.Bieter
 	for _, bieter := range m.Bieter {
+		allBieter = append(allBieter, bieter)
 		if bieter.Jaehrlich {
 			jaehrlich = append(jaehrlich, bieter)
 			continue
@@ -740,6 +741,15 @@ func (s server) handleAdminZIP(w http.ResponseWriter, _ *http.Request) error {
 
 	if err := writeCSVToZip(zipW, "bieter_monatlich.csv", monatlich, false); err != nil {
 		return fmt.Errorf("write bieter_monatlich.csv: %w", err)
+	}
+
+	fileW, err := zipW.Create("Lastschrifteinzug.csv")
+	if err != nil {
+		return fmt.Errorf("create csv file for lastschrifteinzug: %w", err)
+	}
+
+	if err := writeSEPACSVToZip(fileW, allBieter); err != nil {
+		return fmt.Errorf("write csv file for lastschrifteinzug: %w", err)
 	}
 
 	return nil
