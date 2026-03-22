@@ -5,12 +5,12 @@ import (
 	"cmp"
 	"context"
 	"embed"
-	"encoding/csv"
 	"errors"
 	"fmt"
 	"hash/crc32"
 	"io/fs"
 	"log"
+	"maps"
 	"net"
 	"net/http"
 	"slices"
@@ -725,53 +725,24 @@ func (s server) handleAdminZIP(w http.ResponseWriter, _ *http.Request) error {
 	zipW := zip.NewWriter(w)
 	defer zipW.Close()
 
-	var jaehrlich, monatlich, allBieter []model.Bieter
-	for _, bieter := range m.Bieter {
-		allBieter = append(allBieter, bieter)
-		if bieter.Jaehrlich {
-			jaehrlich = append(jaehrlich, bieter)
-			continue
-		}
-		monatlich = append(monatlich, bieter)
-	}
+	var bieterList = slices.Collect(maps.Values(m.Bieter))
 
-	if err := writeCSVToZip(zipW, "bieter_jaehrlich.csv", jaehrlich, true); err != nil {
-		return fmt.Errorf("write bieter_jaehrlich.csv: %w", err)
-	}
-
-	if err := writeCSVToZip(zipW, "bieter_monatlich.csv", monatlich, false); err != nil {
-		return fmt.Errorf("write bieter_monatlich.csv: %w", err)
-	}
-
-	fileW, err := zipW.Create("Lastschrifteinzug.csv")
+	fileJaehrlich, err := zipW.Create("Lastschrifteinzug_jaehrlich.csv")
 	if err != nil {
-		return fmt.Errorf("create csv file for lastschrifteinzug: %w", err)
+		return fmt.Errorf("create csv file for lastschrifteinzug jaehrlich: %w", err)
 	}
 
-	if err := writeSEPACSVToZip(fileW, allBieter); err != nil {
-		return fmt.Errorf("write csv file for lastschrifteinzug: %w", err)
+	if err := writeSEPACSVToZip(fileJaehrlich, bieterList, true); err != nil {
+		return fmt.Errorf("write csv file for lastschrifteinzug jaehrlich: %w", err)
 	}
 
-	return nil
-}
-
-func writeCSVToZip(zipW *zip.Writer, filename string, bieter []model.Bieter, jaehrlich bool) error {
-	fileW, err := zipW.Create(filename)
+	fileMonatlich, err := zipW.Create("Lastschrifteinzug_monatlich.csv")
 	if err != nil {
-		return fmt.Errorf("create csv file: %w", err)
+		return fmt.Errorf("create csv file for lastschrifteinzug monatlich: %w", err)
 	}
 
-	csvW := csv.NewWriter(fileW)
-	defer csvW.Flush()
-
-	if err := csvW.Write(model.BieterCSVHeader()); err != nil {
-		return fmt.Errorf("create csv header: %w", err)
-	}
-
-	for _, b := range bieter {
-		if err := csvW.Write(b.CSVRecord(jaehrlich)); err != nil {
-			return fmt.Errorf("write csv record for %s: %w", b.Name(), err)
-		}
+	if err := writeSEPACSVToZip(fileMonatlich, bieterList, false); err != nil {
+		return fmt.Errorf("write csv file for lastschrifteinzug monatlich: %w", err)
 	}
 
 	return nil

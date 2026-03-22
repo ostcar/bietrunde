@@ -148,59 +148,6 @@ func (b Bieter) InvalidFields() map[string]string {
 	return invalid
 }
 
-// BieterCSVHeader returns the header coresponding to Bieter.CSVRecord().
-func BieterCSVHeader() []string {
-	return []string{
-		"id",
-		"vorname",
-		"nachname",
-		"mail",
-		"adresse",
-		"mitglied",
-		"verteilstelle",
-		"teilpartner",
-		"iban",
-		"kontoinhaber",
-		"abbuchung",
-		"gebot",
-	}
-}
-
-// CSVRecord returns the bieter as csv record
-func (b Bieter) CSVRecord(jaehrlich bool) []string {
-	mitglied := "Nein"
-	if b.Mitglied {
-		mitglied = "Ja"
-	}
-	abbuchung := "monatlich"
-	if b.Jaehrlich {
-		abbuchung = "jährlich"
-	}
-	gebot := ""
-	if !b.Gebot.Empty() {
-		if b.Jaehrlich {
-			gebot = (b.Gebot * 12).String()
-		} else {
-			gebot = b.Gebot.String()
-		}
-	}
-
-	return []string{
-		strconv.Itoa(b.ID),
-		b.Vorname,
-		b.Nachname,
-		b.Mail,
-		b.Adresse,
-		mitglied,
-		b.Verteilstelle.String(),
-		b.Teilpartner,
-		b.IBAN,
-		b.ShowKontoinhaber(),
-		abbuchung,
-		gebot,
-	}
-}
-
 func strInGroup(str string, size int) []string {
 	var parts []string
 	for len(str) > 0 {
@@ -223,6 +170,10 @@ func formatIBAN(iban string) string {
 	withoutSpace := strings.ReplaceAll(iban, " ", "")
 	parts := strInGroup(withoutSpace, 4)
 	return strings.Join(parts, " ")
+}
+
+func (b Bieter) IBANTrimed() string {
+	return strings.ReplaceAll(b.IBAN, " ", "")
 }
 
 // Model of the service.
