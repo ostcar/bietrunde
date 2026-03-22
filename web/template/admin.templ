@@ -57,6 +57,13 @@ templ AdminButtons(state model.ServiceState) {
 			>
 				Export
 			</a>
+			<a
+ 				class="button is-warning"
+ 				href="/admin/verteilstellen"
+			>
+				Verteilstellen
+			</a>
+
 		}
 	</div>
 }
@@ -411,4 +418,21 @@ func countVerteilstelle(bieter []model.Bieter, verteilstelle model.Verteilstelle
 		}
 	}
 	return strconv.Itoa(count)
+}
+
+
+templ Verteilstellen(ordered map[model.Verteilstelle][]string) {
+	@layout("Admin", true) {
+		<h1  class="title is-1">Verteilstellen</h1>
+		for verteilstelle, names := range ordered {
+			<div class="box">
+			<h2  class="title is-2">{ verteilstelle.String() }</h2>
+			<ul>
+				for _, name := range names {
+					<li>{ name }</li>
+				}
+			</ul>
+			</div>
+		}
+	}
 }

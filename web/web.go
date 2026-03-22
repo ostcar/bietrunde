@@ -103,6 +103,7 @@ func (s *server) registerHandlers() {
 	router.Handle("/admin/state", handleError(s.adminPage(s.handleAdminState)))
 	router.Handle("/admin/reset-gebot", handleError(s.adminPage(s.handleAdminResetGebot)))
 	router.Handle("/admin/zip", handleError(s.adminPage(s.handleAdminZIP)))
+	router.Handle("/admin/verteilstellen", handleError(s.adminPage(s.handleVerteilstellen)))
 	router.Handle("/admin/sse", handleError(s.adminPage(s.handleAdminSSE)))
 
 	s.Handler = loggingMiddleware(router)
@@ -746,6 +747,27 @@ func (s server) handleAdminZIP(w http.ResponseWriter, _ *http.Request) error {
 	}
 
 	return nil
+}
+
+func (s server) handleVerteilstellen(w http.ResponseWriter, r *http.Request) error {
+
+	m, done := s.model.ForReading()
+	defer done()
+
+	ordered := make(map[model.Verteilstelle][]string)
+	for _, bieter := range m.Bieter {
+		v := bieter.Verteilstelle
+		if _, ok := ordered[v]; !ok {
+			ordered[v] = make([]string, 0)
+		}
+		name := bieter.Name()
+		if name == "" {
+			continue
+		}
+		ordered[v] = append(ordered[v], name)
+	}
+
+	return template.Verteilstellen(ordered).Render(r.Context(), w)
 }
 
 func (s server) handleAdminSSE(w http.ResponseWriter, r *http.Request) error {
