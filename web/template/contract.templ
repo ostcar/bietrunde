@@ -1,0 +1,27 @@
+package template
+
+import (
+)
+
+templ Contract(contract string, accepted bool) {
+	@layout("Bietrunde - Vertrag", true) {
+		<h1 class="title is-4">Gemüsevertrag</h1>
+		{ contract }
+		if accepted {
+			<div class="control">
+				<a href="/" class="button is-link is-light">Zurück</a>
+			</div>
+		} else {
+			<form action="/vertrag" method="post">
+				<div class="field is-grouped">
+					<div class="control">
+						<button class="button is-primary" type="submit">Ich akzeptiere den Gemüsevertrag</button>
+					</div>
+					<div class="control">
+						<a href="/" class="button is-link is-light">Ich komme später wieder</a>
+					</div>
+				</div>
+			</form>
+		}
+	}
+}

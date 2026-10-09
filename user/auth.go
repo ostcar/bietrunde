@@ -10,7 +10,7 @@ import (
 
 const (
 	authCookieName = "bietrunde"
-	loginTime      = 265 * 24 * time.Hour
+	loginTime      = 365 * 24 * time.Hour
 )
 
 // User represents a logged in user.

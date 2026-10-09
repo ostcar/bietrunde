@@ -21,10 +21,6 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 			<dd class={ classes("ml-5", errClass(invalidFields["adresse"])) }>
 				@ddmultilineString(bieter.Adresse)
 			</dd>
-			<dt class="has-text-weight-bold">Telefonnummer:</dt>
-			<dd class={ classes("ml-5", errClass(invalidFields["telefon"])) }>
-				@ddString(bieter.Telefon)
-			</dd>
 			<dt class="has-text-weight-bold">Mitglied:</dt>
 			<dd class={ classes("ml-5", errClass(invalidFields["mitglied"])) }>
 				@jaNein(bieter.Mitglied)
@@ -33,9 +29,9 @@ templ Bieter(state model.ServiceState, bieter model.Bieter, err string, invalidF
 			<dd class={ classes("ml-5", errClass(invalidFields["verteilstelle"])) }>
 				@ddString(bieter.Verteilstelle.String())
 			</dd>
-			<dt class="has-text-weight-bold">Anteil:</dt>
+			<dt class="has-text-weight-bold">Teilpartner:</dt>
 			<dd class="ml-5">
-				@anteilString( bieter.GanzOderHalb, bieter.Teilpartner)
+				@ddString( bieter.Teilpartner)
 			</dd>
 			<dt class="has-text-weight-bold">IBAN:</dt>
 			<dd class={ classes("ml-5", errClass(invalidFields["iban"])) }>

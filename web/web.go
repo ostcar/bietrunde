@@ -2,6 +2,7 @@ package web
 
 import (
 	"archive/zip"
+	"bytes"
 	"cmp"
 	"context"
 	"embed"
@@ -16,11 +17,12 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	tt "text/template"
 
 	"github.com/gorilla/mux"
 	"github.com/ostcar/bietrunde/config"
+	"github.com/ostcar/bietrunde/mail"
 	"github.com/ostcar/bietrunde/model"
-	"github.com/ostcar/bietrunde/pdf"
 	"github.com/ostcar/bietrunde/user"
 	"github.com/ostcar/bietrunde/web/template"
 	"github.com/ostcar/sticky"
@@ -104,6 +106,7 @@ func (s *server) registerHandlers() {
 	router.Handle("/admin/reset-gebot", handleError(s.adminPage(s.handleAdminResetGebot)))
 	router.Handle("/admin/zip", handleError(s.adminPage(s.handleAdminZIP)))
 	router.Handle("/admin/verteilstellen", handleError(s.adminPage(s.handleVerteilstellen)))
+	router.Handle("/admin/send_confirmation", handleError(s.adminPage(s.handleAdminSendConfirmation)))
 	router.Handle("/admin/sse", handleError(s.adminPage(s.handleAdminSSE)))
 
 	s.Handler = loggingMiddleware(router)
@@ -337,23 +340,30 @@ func (s server) handleVertrag(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
+	if r.Method == http.MethodPost {
+		m, write, done := s.model.ForWriting()
+		defer done()
+
+		event := m.BieterAcceptContract(user.BieterID)
+
+		if err := write(event); err != nil {
+			return fmt.Errorf("write accept contract event: %w", err)
+		}
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return nil
+	}
+
 	m, done := s.model.ForReading()
 	defer done()
 
 	bieter, ok := m.Bieter[user.BieterID]
-
 	if user.IsAnonymous() || !ok {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return nil
 	}
 
-	vertrag, err := pdf.Bietervertrag(s.cfg.BaseURL, bieter)
-	if err != nil {
-		return err
-	}
-
-	_, err = w.Write(vertrag)
-	return err
+	return template.Contract(contract, bieter.ContractAccepted).Render(r.Context(), w)
 }
 
 func (s server) handleSSE(w http.ResponseWriter, r *http.Request) error {
@@ -770,6 +780,104 @@ func (s server) handleVerteilstellen(w http.ResponseWriter, r *http.Request) err
 	return template.Verteilstellen(ordered).Render(r.Context(), w)
 }
 
+func (s server) handleAdminSendConfirmation(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Add("Content-Type", "text/html")
+	w.Header().Add("Content-Disposition", "inline")
+
+	if r.Method != http.MethodPost {
+		return fmt.Errorf("invalid method")
+	}
+
+	m, done := s.model.ForReading()
+	defer done()
+
+	mails := make([]*mail.Msg, 0, len(m.Bieter))
+	for _, bieter := range m.Bieter {
+		if bieter.Gebot.Empty() {
+			continue
+		}
+
+		text, err := genMailConfirmText(bieter)
+		if err != nil {
+			return fmt.Errorf("creating mail-text for %s: %w", bieter.Name(), err)
+		}
+
+		m, err := mail.CreateMail(s.cfg, bieter.Mail, true, "Gemüsevertrag", text)
+		if err != nil {
+			return fmt.Errorf("creating mail for %s: %w", bieter.Name(), err)
+		}
+		mails = append(mails, m)
+	}
+
+	if err := mail.SendMails(s.cfg.Debug, mails...); err != nil {
+		return fmt.Errorf("sending mails: %w", err)
+	}
+
+	fmt.Fprintf(w, `<span class="button is-success" disabled>
+	    ✓ Erfolgreich gesendet
+	</span>`)
+	return nil
+}
+
+func genMailConfirmText(bieter model.Bieter) (string, error) {
+	data := struct {
+		model.Bieter
+		Contract string
+	}{
+		Bieter:   bieter,
+		Contract: contract,
+	}
+
+	var buf bytes.Buffer
+	if err := mailConfigmationTmpl.Execute(&buf, data); err != nil {
+		return "", fmt.Errorf("execute template: %w", err)
+	}
+
+	return buf.String(), nil
+}
+
+const contract = `
+Der Gemüsevertrag gilt für die gesamten 12 Monate des Gemüsejahres, daher von April bis März.
+Ich verpflichte mich, mein Gemüse wöchentlich an der vereinbarten Verteilstelle abzuholen.
+Ich respektiere die in den Verteilstellen genannten Anteilsmengen und Abholfristen.
+Ich habe keinen Anspruch auf eine bestimmte Menge und Qualität der Produkte.
+Sollte es mir vorübergehend nicht möglich sein, meinen Pflichten (Abholung) nachzukommen,
+so sorge ich selbst in diesem Zeitraum für einen Ersatz.
+Im Falle einer Urlaubsvertretung weise ich persönlich in die Abholmodalitäten ein.
+Die endgültige Abgabe meines Anteils im laufenden Jahr ist nur möglich, wenn ein anderes Vereinsmitglied,
+das bisher keinen Ernteanteil bezieht oder ein neues Mitglied, den oben genannten monatlichen
+finanziellen Beitrag für die verbleibenden Monate übernimmt.
+Erst ab Abschluss des neuen Gemüsevertrages erfolgt der Lastschrifteinzug von
+diesem neuen Mitglied.
+
+Für die Abbuchung meines Beitrages erteile ich ein SEPA-Lastschriftmandat.
+Ist eine Abbuchung nicht möglich, so geht die Rückbuchungsgebühr zu meinen Lasten.
+`
+
+var mailConfigmationTmpl = MustParse("mailConfirmation", mailConfirmationTmplText)
+
+const mailConfirmationTmplText = `Hallo {{ .Name }},
+
+vielen Dank für den Abschluss des Gemüsevertrags. Hiermit erhältst du alle wichtigen Informationen.
+
+Dein monatlicher Beitrag für den Gemüseanteil ist {{ .Gebot }}.
+
+{{- if .Jaehrlich }}
+Der Betrag für das gesamte Jahr wird am ersten Werktag im April 2026 abgebucht.
+{{- else }}
+Der monatliche Betrag wird jeweils am ersten Werktag eines Monats abgebucht.
+{{- end }}
+
+Du hast dich entschieden dein Gemüse in der Verteilstelle in {{ .Verteilstelle }} abzuholen.
+
+Der vereinbarte Gemüsevertrag lautet:
+{{ .Contract }}
+
+
+Viele Grüße
+Der Vorstand
+`
+
 func (s server) handleAdminSSE(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Add("Content-Type", "text/event-stream")
 	w.Header().Add("Content-Disposition", "inline")
@@ -861,4 +969,12 @@ func userError(err error) string {
 	}
 
 	return "Unbekannter Fehler"
+}
+
+func MustParse(name string, text string) *tt.Template {
+	result, err := tt.New("mailConfirmation").Parse(mailConfirmationTmplText)
+	if err != nil {
+		panic(fmt.Errorf("Parsing template: %v", err))
+	}
+	return result
 }
