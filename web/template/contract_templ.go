@@ -9,8 +9,6 @@ import "context"
 import "io"
 import "bytes"
 
-import ()
-
 func Contract(contract string, accepted bool) templ.Component {
 	return templ.ComponentFunc(func(templ_7745c5c3_Ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
