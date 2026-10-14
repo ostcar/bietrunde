@@ -11,10 +11,10 @@ const SEPACSVHeader = `Basislastschrift;;;;;;;;;;;;;;;;;;;;
 Fälligkeitstermin;Zahlungspflichtiger;Straße;Gebäude Nr.;Postleitzahl;Stadt;Länder-Kennzeichen;Land;IBAN Zahlungspflichtiger;BIC;Bei Kreditinstitut;Betrag;Verwendungszweck 1;Verwendungszweck 2;IBAN des Zahlungsempfängers;Zahlungsempfänger;Abweichender Zahlungsempfänger;Mandatsreferenz;Unterschrieben am;Ausführungsart;Gläubiger ID des Zahlungsempfängers
 `
 
-const SEPACSVLine = `%s;%s;;;;;;;%s;;;%s;Gemüseanteil 26.27 Baarfood;;DE24643901300278501001;Solidarische Landwirtschaft;;25%d;26.11.2025;einmalig;DE62ZZZ00001997635
+const SEPACSVLine = `%s;%s;;;;;;;%s;;;%s;Gemüseanteil 27.28 Baarfood;;DE24643901300278501001;Solidarische Landwirtschaft;;27%d;26.11.2025;einmalig;DE62ZZZ00001997635
 `
 
-const abbuchung = "02.04.2026"
+const abbuchung = "01.04.2027"
 
 func writeSEPACSVToZip(w io.Writer, bieter []model.Bieter, jaehrlich bool) error {
 	if _, err := w.Write([]byte(SEPACSVHeader)); err != nil {

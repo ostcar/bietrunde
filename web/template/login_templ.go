@@ -36,7 +36,7 @@ func LoginPage(state model.ServiceState, fieldBietNummer string, loginErr, regis
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var3 := `Willkommen zur Bietrunde für das Gemüsejahr 2026/2027`
+			templ_7745c5c3_Var3 := `Willkommen zur Bietrunde für das Gemüsejahr 2027/2028`
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -50,7 +50,7 @@ func LoginPage(state model.ServiceState, fieldBietNummer string, loginErr, regis
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Var4 := `Hier kannst du dich für das kommende Gemüsejahr anmelden. `
+				templ_7745c5c3_Var4 := `Hier kannst du dich für das kommende Gemüsejahr anmelden.`
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -59,7 +59,7 @@ func LoginPage(state model.ServiceState, fieldBietNummer string, loginErr, regis
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Var5 := `Wenn zum ersten mal die Seite besuchst, dann lege dir eine neue Bietnummer an. `
+				templ_7745c5c3_Var5 := `Wenn zum ersten mal die Seite besuchst, dann lege dir eine neue Bietnummer an.`
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
