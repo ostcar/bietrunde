@@ -3,7 +3,7 @@ package template
 templ Contract(contract string, accepted bool) {
 	@layout("Bietrunde - Vertrag", true) {
 		<h1 class="title is-4">Gemüsevertrag</h1>
-		{ contract }
+		@templ.Raw(contract)
 		if accepted {
 			<div class="control">
 				<a href="/" class="button is-link is-light">Zurück</a>
