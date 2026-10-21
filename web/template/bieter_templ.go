@@ -403,7 +403,7 @@ func GebotShow(state model.ServiceState, bieter model.Bieter, err string) templ.
 					return templ_7745c5c3_Err
 				}
 			} else if !bieter.ContractAccepted {
-				templ_7745c5c3_Var25 := `Bitte akzeptiere den `
+				templ_7745c5c3_Var25 := `Bitte akzeptiere die `
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -412,7 +412,7 @@ func GebotShow(state model.ServiceState, bieter model.Bieter, err string) templ.
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Var26 := `Gemüsevertrag`
+				templ_7745c5c3_Var26 := `Teilnahmebedingungen`
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -435,7 +435,7 @@ func GebotShow(state model.ServiceState, bieter model.Bieter, err string) templ.
 			}
 		case model.StateValidation:
 			if !bieter.ContractAccepted {
-				templ_7745c5c3_Var29 := `Bitte akzeptiere den `
+				templ_7745c5c3_Var29 := `Bitte akzeptiere die `
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -444,7 +444,7 @@ func GebotShow(state model.ServiceState, bieter model.Bieter, err string) templ.
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Var30 := `Gemüsevertrag`
+				templ_7745c5c3_Var30 := `Teilnahmebedingungen`
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -492,7 +492,7 @@ func GebotShow(state model.ServiceState, bieter model.Bieter, err string) templ.
 			}
 		case model.StateOffer:
 			if !bieter.ContractAccepted {
-				templ_7745c5c3_Var36 := `Bitte akzeptiere den `
+				templ_7745c5c3_Var36 := `Bitte akzeptiere die `
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -501,7 +501,7 @@ func GebotShow(state model.ServiceState, bieter model.Bieter, err string) templ.
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Var37 := `Gemüsevertrag`
+				templ_7745c5c3_Var37 := `Teilnahmebedingungen`
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -596,7 +596,7 @@ func GebotShow(state model.ServiceState, bieter model.Bieter, err string) templ.
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Var45 := `Solltest du in den nächsten Tagen keine E-Mail erhlaten, dann melde dich bitte beim Vorstand.`
+				templ_7745c5c3_Var45 := `Solltest du in den nächsten Tagen keine E-Mail erhalten, dann melde dich bitte beim Vorstand.`
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -649,7 +649,7 @@ func ContractAccept(bieter model.Bieter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var48 := `Du hast den `
+			templ_7745c5c3_Var48 := `Du hast die `
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -658,7 +658,7 @@ func ContractAccept(bieter model.Bieter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var49 := `Gemüsevertrag`
+			templ_7745c5c3_Var49 := `Teilnahmebedingungen`
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -690,7 +690,7 @@ func ContractAccept(bieter model.Bieter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var52 := `Der `
+			templ_7745c5c3_Var52 := `Die `
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -699,7 +699,7 @@ func ContractAccept(bieter model.Bieter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var53 := `Gemüsevertrag`
+			templ_7745c5c3_Var53 := `Teilnahmebedingungen`
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var53)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -708,7 +708,7 @@ func ContractAccept(bieter model.Bieter) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var54 := `muss akzeptiert werden.`
+			templ_7745c5c3_Var54 := `müssen akzeptiert werden.`
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var54)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -750,7 +750,7 @@ func gebotForm(gebot model.Gebot, err string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" step=\"0.01\"></p><p class=\"control\"><button class=\"button is-info\" type=\"submit\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" step=\"1\"></p><p class=\"control\"><button class=\"button is-info\" type=\"submit\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

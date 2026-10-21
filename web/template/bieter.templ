@@ -78,13 +78,13 @@ templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
 			if len(bieter.InvalidFields()) > 0 {
 				Deine Daten sind nicht valide. <a href="/edit">Bitte passe diese an.</a>
 			} else if !bieter.ContractAccepted {
-				Bitte akzeptiere den <a href="/vertrag">Gemüsevertrag</a>.
+				Bitte akzeptiere die <a href="/vertrag">Teilnahmebedingungen</a>.
 			} else {
 				Bitte notiere dir deine Bietnummer. Du brauchst sie wärend der Bietrunde.
 			}
 		case model.StateValidation:
 			if !bieter.ContractAccepted {
-				Bitte akzeptiere den <a href="/vertrag">Gemüsevertrag</a>.
+				Bitte akzeptiere die <a href="/vertrag">Teilnahmebedingungen</a>.
 			} else if len(bieter.InvalidFields()) == 0 {
 				Bitte notiere dir deine Bietnummer. Du brauchst sie wärend der Bietrunde.
 			} else if bieter.CanSelfEdit {
@@ -94,7 +94,7 @@ templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
 			}
 		case model.StateOffer:
 			if !bieter.ContractAccepted {
-				Bitte akzeptiere den <a href="/vertrag">Gemüsevertrag</a>.
+				Bitte akzeptiere die <a href="/vertrag">Teilnahmebedingungen</a>.
 			} else if bieter.Anwesend {
 				<p><strong>Dein monatliches Gebot:</strong> { bieter.Gebot.String() }</p>
 				if state == model.StateOffer {
@@ -110,7 +110,7 @@ templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
 		if bieter.Gebot != 0 {
 			<p>
 				Du wirst eine Bestätigungs-E-Mail mit deinem Gebot erhalten.
-				Solltest du in den nächsten Tagen keine E-Mail erhlaten, dann melde dich bitte beim Vorstand.
+				Solltest du in den nächsten Tagen keine E-Mail erhalten, dann melde dich bitte beim Vorstand.
 			</p>
 		}
 	}
@@ -120,9 +120,9 @@ templ GebotShow(state model.ServiceState, bieter model.Bieter, err string) {
 templ ContractAccept(bieter model.Bieter) {
 	<div id="contract_accept" class="box">
 		if bieter.ContractAccepted {
-			<p><span style="color: #48c774;">✓</span> Du hast den <a href="/vertrag">Gemüsevertrag</a> akzeptiert.</p>
+			<p><span style="color: #48c774;">✓</span> Du hast die <a href="/vertrag">Teilnahmebedingungen</a> akzeptiert.</p>
 		} else {
-			<p><span style="color: red;">❌</span> Der <a href="/vertrag">Gemüsevertrag</a> muss akzeptiert werden.</p>
+			<p><span style="color: red;">❌</span> Die <a href="/vertrag">Teilnahmebedingungen</a> müssen akzeptiert werden.</p>
 		}
 	</div>
 }
@@ -139,7 +139,7 @@ templ gebotForm(gebot model.Gebot, err string) {
  						type="number"
  						placeholder="Monatlicher Betrag"
  						value={ gebot.NumberString() }
- 						step="0.01"
+ 						step="1"
 					/>
 				</p>
 				<p class="control">

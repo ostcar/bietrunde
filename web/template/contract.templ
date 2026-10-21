@@ -2,7 +2,11 @@ package template
 
 templ Contract(contract string, accepted bool) {
 	@layout("Bietrunde - Vertrag", true) {
-		<h1 class="title is-4">Gemüsevertrag</h1>
+		<div id="contract">
+		<h1 class="title is-4">Teilnahmebedingungen</h1>
+		<p>
+			Mit der Anmeldung zur Bietrunde am 25.11.2026 erkläre ich mich mit folgenden Bedingungen einverstanden:
+		</p>
 		@templ.Raw(contract)
 		if accepted {
 			<div class="control">
@@ -12,7 +16,7 @@ templ Contract(contract string, accepted bool) {
 			<form action="/vertrag" method="post">
 				<div class="field is-grouped">
 					<div class="control">
-						<button class="button is-primary" type="submit">Ich akzeptiere den Gemüsevertrag</button>
+						<button class="button is-primary" type="submit">Ich akzeptiere die Teilnahmebedingungen</button>
 					</div>
 					<div class="control">
 						<a href="/" class="button is-link is-light">Ich komme später wieder</a>
@@ -20,5 +24,6 @@ templ Contract(contract string, accepted bool) {
 				</div>
 			</form>
 		}
+		</div>
 	}
 }

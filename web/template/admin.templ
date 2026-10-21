@@ -190,7 +190,7 @@ templ AdminUserTable(bieter []model.Bieter, sort string) {
 						<td style="min-width:110px">
 							if bieter.CanSelfEdit {
 								<button
- 									title="CanSelfEdit"
+ 									title="Can sich selbst Bearbeiten"
  									class="button is-warning is-small"
  									hx-post={ "/admin/can_not_self_edit/"+strconv.Itoa(bieter.ID) }
  									hx-target="#admin-user-table"
@@ -198,7 +198,7 @@ templ AdminUserTable(bieter []model.Bieter, sort string) {
 								>🔓</button>
 							} else {
 								<button
- 									title="CanSelfEdit"
+ 									title="Can sich selbst Bearbeiten"
  									class="button is-warning is-small"
  									hx-post={ "/admin/can_self_edit/"+strconv.Itoa(bieter.ID) }
  									hx-target="#admin-user-table"
@@ -267,7 +267,7 @@ templ AdminBieterEdit(bieter model.Bieter, fieldErrors map[string]string) {
 	@adminModalForm(bieter.Name(), "/admin/edit/"+ strconv.Itoa(bieter.ID)) {
 		if !bieter.ContractAccepted {
 			<div class="box">
-				<strong>Der Gemüsevertrag wurde bisher nicht akzeptiert.</strong>
+				<strong>Die Teilnahmebedingungen wurde bisher nicht akzeptiert.</strong>
 			</div>
 		}
 		@bieterEditFormFields(bieter, fieldErrors)

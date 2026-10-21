@@ -485,7 +485,7 @@ func AdminUserTable(bieter []model.Bieter, sort string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if bieter.CanSelfEdit {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button title=\"CanSelfEdit\" class=\"button is-warning is-small\" hx-post=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button title=\"Can sich selbst Bearbeiten\" class=\"button is-warning is-small\" hx-post=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -507,7 +507,7 @@ func AdminUserTable(bieter []model.Bieter, sort string) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button title=\"CanSelfEdit\" class=\"button is-warning is-small\" hx-post=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button title=\"Can sich selbst Bearbeiten\" class=\"button is-warning is-small\" hx-post=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -903,7 +903,7 @@ func AdminBieterEdit(bieter model.Bieter, fieldErrors map[string]string) templ.C
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Var61 := `Der Gemüsevertrag wurde bisher nicht akzeptiert.`
+				templ_7745c5c3_Var61 := `Die Teilnahmebedingungen wurde bisher nicht akzeptiert.`
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var61)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

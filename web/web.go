@@ -848,10 +848,13 @@ func genMailConfirmText(bieter model.Bieter) (string, error) {
 const contract = `
 Der Gemüsevertrag gilt für die gesamten 12 Monate des Gemüsejahres, daher von April bis März.
 Ich verpflichte mich, mein Gemüse wöchentlich an der vereinbarten Verteilstelle abzuholen.
+
 Ich respektiere die in den Verteilstellen genannten Anteilsmengen und Abholfristen.
 Ich habe keinen Anspruch auf eine bestimmte Menge und Qualität der Produkte.
+
 Sollte es mir vorübergehend nicht möglich sein, meinen Pflichten (Abholung) nachzukommen,
 so sorge ich selbst in diesem Zeitraum für einen Ersatz. Im Falle einer Urlaubsvertretung weise ich persönlich in die Abholmodalitäten ein.
+
 Die endgültige Abgabe meines Anteils im laufenden Jahr ist nur möglich, wenn ein anderes Vereinsmitglied,
 das bisher keinen Ernteanteil bezieht oder ein neues Mitglied, den oben genannten monatlichen
 finanziellen Beitrag für die verbleibenden Monate übernimmt.
@@ -868,7 +871,7 @@ const mailConfirmationTmplText = `Hallo {{ .Name }},
 
 vielen Dank für den Abschluss des Gemüsevertrags. Hiermit erhältst du alle wichtigen Informationen.
 
-Dein monatlicher Beitrag für den Gemüseanteil ist {{ .Gebot }}.
+Dein monatlicher Beitrag für den Gemüseanteil ist monatlich {{ .Gebot }}.
 
 {{- if .Jaehrlich }}
 Der Betrag für das gesamte Jahr wird am ersten Werktag im April 2026 abgebucht.
@@ -881,6 +884,7 @@ Du hast dich entschieden dein Gemüse in der Verteilstelle in {{ .Verteilstelle 
 Der vereinbarte Gemüsevertrag lautet:
 {{ .Contract }}
 
+Deine SEPA-Mandatsreferenz lautet: 26{{ .ID }}.
 
 Viele Grüße
 Der Vorstand

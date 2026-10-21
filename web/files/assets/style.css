@@ -1,3 +1,7 @@
 table tr:nth-child(2n) {
     background-color: hsl(0, 0%, 96%);
 }
+
+#contract p {
+    padding-bottom: 0.5em;
+}
