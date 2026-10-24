@@ -190,7 +190,7 @@ templ AdminUserTable(bieter []model.Bieter, sort string) {
 						<td style="min-width:110px">
 							if bieter.CanSelfEdit {
 								<button
- 									title="Can sich selbst Bearbeiten"
+ 									title="Kann sich selbst Bearbeiten"
  									class="button is-warning is-small"
  									hx-post={ "/admin/can_not_self_edit/"+strconv.Itoa(bieter.ID) }
  									hx-target="#admin-user-table"
@@ -198,7 +198,7 @@ templ AdminUserTable(bieter []model.Bieter, sort string) {
 								>🔓</button>
 							} else {
 								<button
- 									title="Can sich selbst Bearbeiten"
+ 									title="Kann sich selbst Bearbeiten"
  									class="button is-warning is-small"
  									hx-post={ "/admin/can_self_edit/"+strconv.Itoa(bieter.ID) }
  									hx-target="#admin-user-table"
